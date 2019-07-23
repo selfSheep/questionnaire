@@ -26,3 +26,21 @@ class Choice(models.Model):
     choice_type = models.CharField(max_length=5, verbose_name='选项类型')
     choice_content = models.CharField(max_length=100, verbose_name='选项内容')
     question = models.ForeignKey(QuestionBank, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return '<id:{} Choice: {}{}>'.format(self.id, self.choice_type, self.choice_content)
+
+
+class MBTIAnwserType(models.Model):
+    ANWSER_TYPE_ITEMS = (
+        ('E', 'E'),
+        ('I', 'I'),
+        ('S', 'S'),
+        ('N', 'N'),
+        ('T', 'T'),
+        ('F', 'F'),
+        ('J', 'J'),
+        ('P', 'P'),
+    )
+    choice = models.ForeignKey(Choice, on_delete=models.CASCADE)
+    anwser_type = models.CharField(max_length=5, choices=ANWSER_TYPE_ITEMS, verbose_name='答案类型')
