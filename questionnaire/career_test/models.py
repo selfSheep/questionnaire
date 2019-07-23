@@ -44,3 +44,33 @@ class MBTIAnwserType(models.Model):
     )
     choice = models.ForeignKey(Choice, on_delete=models.CASCADE)
     anwser_type = models.CharField(max_length=5, choices=ANWSER_TYPE_ITEMS, verbose_name='答案类型')
+
+
+class MBTIResult(models.Model):
+    RESULT_TYPE_ITEMS = (
+        ('ISTJ', 'ISTJ'),
+        ('ISFJ', 'ISFJ'),
+        ('INFJ', 'INFJ'),
+        ('INTJ', 'INTJ'),
+        ('ISTP', 'ISTP'),
+        ('ISFP', 'ISFP'),
+        ('INFP', 'INFP'),
+        ('INTP', 'INTP'),
+        ('ESTP', 'ESTP'),
+        ('ESFP', 'ESFP'),
+        ('ENFP', 'ENFP'),
+        ('ENTP', 'ENTP'),
+        ('ESTJ', 'ESTJ'),
+        ('ESFJ', 'ESFJ'),
+        ('ENFJ', 'ENFJ'),
+        ('ENTJ', 'ENTJ'),
+    )
+    result_type = models.CharField(max_length=5, choices=RESULT_TYPE_ITEMS, verbose_name='报告类型')
+
+    def __str__(self):
+        return '<id:{} result_type: {}>'.format(self.id, self.result_type)
+
+class MBTIResultDetail(models.Model):
+    result_type = models.ForeignKey(MBTIResult, on_delete=models.CASCADE)
+    result_num = models.IntegerField(verbose_name='结果号')
+    result_content = models.CharField(max_length=100, verbose_name='结果内容')

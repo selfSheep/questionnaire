@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import QuestionBank, Choice, MBTIAnwserType
+from .models import QuestionBank, Choice, MBTIAnwserType, MBTIResult, MBTIResultDetail
 
 
 @admin.register(QuestionBank)
@@ -15,3 +15,13 @@ class ChoiceAdmin(admin.ModelAdmin):
 @admin.register(MBTIAnwserType)
 class MBTIAnwserTypeAdmin(admin.ModelAdmin):
     list_display = ('id', 'choice', 'anwser_type')
+
+
+@admin.register(MBTIResult)
+class MBTIResultAdmin(admin.ModelAdmin):
+    list_display = ('id', 'result_type')
+
+
+@admin.register(MBTIResultDetail)
+class MBTIResultDetailAdmin(admin.ModelAdmin):
+    list_display = ('id', 'result_type', 'result_num', 'result_content')
