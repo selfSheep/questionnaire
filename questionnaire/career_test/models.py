@@ -26,3 +26,51 @@ class Choice(models.Model):
     choice_type = models.CharField(max_length=5, verbose_name='选项类型')
     choice_content = models.CharField(max_length=100, verbose_name='选项内容')
     question = models.ForeignKey(QuestionBank, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return '<id:{} Choice: {}{}>'.format(self.id, self.choice_type, self.choice_content)
+
+
+class MBTIAnwserType(models.Model):
+    ANWSER_TYPE_ITEMS = (
+        ('E', 'E'),
+        ('I', 'I'),
+        ('S', 'S'),
+        ('N', 'N'),
+        ('T', 'T'),
+        ('F', 'F'),
+        ('J', 'J'),
+        ('P', 'P'),
+    )
+    choice = models.ForeignKey(Choice, on_delete=models.CASCADE)
+    anwser_type = models.CharField(max_length=5, choices=ANWSER_TYPE_ITEMS, verbose_name='答案类型')
+
+
+class MBTIResult(models.Model):
+    RESULT_TYPE_ITEMS = (
+        ('ISTJ', 'ISTJ'),
+        ('ISFJ', 'ISFJ'),
+        ('INFJ', 'INFJ'),
+        ('INTJ', 'INTJ'),
+        ('ISTP', 'ISTP'),
+        ('ISFP', 'ISFP'),
+        ('INFP', 'INFP'),
+        ('INTP', 'INTP'),
+        ('ESTP', 'ESTP'),
+        ('ESFP', 'ESFP'),
+        ('ENFP', 'ENFP'),
+        ('ENTP', 'ENTP'),
+        ('ESTJ', 'ESTJ'),
+        ('ESFJ', 'ESFJ'),
+        ('ENFJ', 'ENFJ'),
+        ('ENTJ', 'ENTJ'),
+    )
+    result_type = models.CharField(max_length=5, choices=RESULT_TYPE_ITEMS, verbose_name='报告类型')
+
+    def __str__(self):
+        return '<id:{} result_type: {}>'.format(self.id, self.result_type)
+
+class MBTIResultDetail(models.Model):
+    result_type = models.ForeignKey(MBTIResult, on_delete=models.CASCADE)
+    result_num = models.IntegerField(verbose_name='结果号')
+    result_content = models.CharField(max_length=100, verbose_name='结果内容')

@@ -1,0 +1,178 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+
+{# 标题 #}
+{% block title %}
+    主页
+{% endblock %}
+
+{# 标题栏高亮 #}
+{% block nav_home_active %}
+    active
+{% endblock %}
+
+{# 网页内容 #}
+{% block content %}
+    <div class="starter-template">
+        <div class="container" id="top">
+            {% for item in question_and_choice %}
+                <div id="choice_{{ item.0.0 }}" class="container question" style="display:none;" data-finished="0">
+                    <h4>{{ item.0.0 }}.{{ item.0.1 }}</h4>
+                    {% if test_type == 'career_anchor' %}
+                        <div class="btn-group" role="group" aria-label="button group">
+                    {% else %}
+                        <div class="btn-group-vertical" role="group" aria-label="Vertical button group">
+                    {% endif %}
+                    {% for choice in item.1 %}
+                        <div class="btn-group" role="group">
+                            <button type="button" class="btn btn-default select choice_{{ item.0.0 }}" data-question_num="{{ item.0.0 }}" data-anwser_choice="{{ choice.0 }}" data-num="choice_{{ item.0.0 }}">
+                                {{ choice.0 }}.{{ choice.1 }}
+                            </button>
+                        </div>
+                    {% endfor %}
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+    <div class="starter-template">
+        <div class="container">
+            <button id="next_btn" class="btn btn-block btn-primary" type="button" onclick="next_page()" style="display:none;">下一页</button>
+            <button id="over_btn" class="btn btn-block btn-success" type="button" onclick="test_finished()" style="display:none;">完成</button>
+        </div>
+        <br>
+        <div class="container">
+            <div class="progress">
+                <div id="progress_bar" class="progress-bar progress-bar-striped" role="progressbar" style="width: 0%"></div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{# 代码区域 #}
+{% block script %}
+    <script type="text/javascript">
+        var choice_button = document.getElementsByClassName("select");
+        var finished_tag = 0;
+        var questions = document.getElementsByClassName("question");
+        var start_num = 0;
+        var last_num = 0;
+        var is_last_page = false;
+        var current_progress = 0;
+        var total_progress = parseFloat("{{ question_len }}");
+
+        // 给选项按钮添加点击事件
+        for (var i = choice_button.length - 1; i >= 0; i--) {
+            choice_button[i].onclick = function(){
+                // 清除同一道题的其它选项的颜色
+                var clear_class = this.getAttribute("data-num");
+                var clear_class_buttons = document.getElementsByClassName(clear_class);
+                for (var j = clear_class_buttons.length - 1; j >= 0; j--) {
+                    clear_class_buttons[j].classList.remove("btn-info");
+                }
+                this.classList.add("btn-info");
+                // 标识该题已经选过
+                var target_question = document.getElementById(clear_class);
+                if (target_question.getAttribute("data-finished") == "0") {
+                    target_question.setAttribute("data-finished", "1");
+                    finished_tag += 1;
+                    // 显示下一页或结束页按钮
+                    if (is_last_page) {
+                        if (finished_tag >= last_num - start_num) {
+                            finished_tag = 0;
+                            document.getElementById("over_btn").style.display = "inline";
+                        }
+                    }
+                    else {
+                        if (finished_tag >= 5) {
+                            finished_tag = 0;
+                            document.getElementById("next_btn").style.display = "inline";
+                        }
+                    }
+                }
+            }
+        }
+
+        // 显示前五题
+        function show_questions() {
+            var i = 0;
+            for (i = last_num; i < last_num + 5; i++) {
+                if (!is_last_page && last_num + 5 == questions.length) {
+                    // 标记目前是最后一页
+                    is_last_page = true;
+                }
+                if (i >= questions.length) {
+                    // 标记目前是最后一页
+                    is_last_page = true;
+                    break;
+                }
+                questions[i].style.display = "inline";
+            }
+            start_num = last_num;
+            last_num = i;
+            // 设置进度条显示
+            current_progress += last_num - start_num;
+            document.getElementById("progress_bar").style.width = current_progress / total_progress * 100 + "%";
+        }
+
+        // 点击下一页触发的函数
+        function next_page() {
+            var i = 0;
+            for (i = start_num; i < last_num; i++) {
+                questions[i].style.display = "none";
+            }
+            show_questions();
+            // 点击完之后隐藏下一页按钮
+            document.getElementById("next_btn").style.display = "none";
+            window.scrollTo(0, 0);
+        }
+
+        show_questions();  // 第一次显示题
+
+        // 完成按钮提交内容
+        function test_finished() {
+            var class_anwsers = document.getElementsByClassName("btn-info");
+            var question_array = new Array();
+            var anwser_array = new Array();
+            for (var i = 0;  i < class_anwsers.length; i++) {
+                question_array.push(class_anwsers[i].getAttribute("data-question_num"));
+                anwser_array.push(class_anwsers[i].getAttribute("data-anwser_choice"));
+            }
+            var question_num = JSON.stringify(question_array);
+            var anwser_choice = JSON.stringify(anwser_array);
+            var parames = new Array();
+            parames.push({ name: "question_num", value: question_num});
+            parames.push({ name: "anwser_choice", value: anwser_choice});
+            parames.push({ name: "test_type", value: "{{ test_type }}"});
+            parames.push({ name: "csrfmiddlewaretoken", value: "{{ csrf_token }}"});
+
+            Post("{% url 'handle_anwser' %}", parames);
+
+            return false;
+        }
+
+        /*
+        *功能： 模拟form表单的提交
+        *参数： URL 跳转地址 PARAMTERS 参数
+        */
+        function Post(URL, PARAMTERS) {
+            //创建form表单
+            var temp_form = document.createElement("form");
+            temp_form.action = URL;
+            //如需打开新窗口，form的target属性要设置为'_blank'
+            temp_form.target = "_self";
+            temp_form.method = "post";
+            temp_form.style.display = "none";
+            //添加参数
+            for (var item in PARAMTERS) {
+                var opt = document.createElement("textarea");
+                opt.name = PARAMTERS[item].name;
+                opt.value = PARAMTERS[item].value;
+                temp_form.appendChild(opt);
+            }
+            document.body.appendChild(temp_form);
+            //提交数据
+            temp_form.submit();
+        }
+    </script>
+{% endblock %}
