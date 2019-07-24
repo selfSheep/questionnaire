@@ -3,7 +3,11 @@
 
 {# 标题 #}
 {% block title %}
-    主页
+    {% if test_type == 'MBTI' %}
+        MBTI职业性格测试
+    {% else %}
+        职业锚测试
+    {% endif %}
 {% endblock %}
 
 {# 标题栏高亮 #}
@@ -15,6 +19,13 @@
 {% block content %}
     <div class="starter-template">
         <div class="container" id="top">
+            <h1>
+                {% if test_type == 'MBTI' %}
+                    MBTI职业性格测试
+                {% else %}
+                    职业锚测试
+                {% endif %}
+            </h1>
             {% for item in question_and_choice %}
                 <div id="choice_{{ item.0.0 }}" class="container question" style="display:none;" data-finished="0">
                     <h4>{{ item.0.0 }}.{{ item.0.1 }}</h4>

@@ -15,15 +15,6 @@ def test_page(request, test_type):
     return render(request, 'career_test/test_page.html', context)
 
 
-# def handle_anwser(request):
-#     context = dict()
-#     context['datas'] = request.POST.get('datas', '')
-#     context['test_type'] = request.POST.get('test_type', '')
-#     print(context)
-#     # return JsonResponse(context)
-#     return render(request, 'career_test/test_result.html', context)
-
-
 def handle_anwser(request):
     context = dict()
     # datas, test_type
@@ -52,7 +43,46 @@ def handle_anwser(request):
         final_results = MBTIResult.objects.get(result_type=result_str).mbtiresultdetail_set.all().order_by('result_num')
         context['result_str'] = result_str
         context['final_results'] = final_results
-        print(context)
+        # print(context)
+        return render(request, 'career_test/mbti_result.html', context)
     else:
+        # 统计前三个最高分的选项，若出现同分，则询问用户更加喜爱哪个题目
+        # question_num, anwser_choice
+        # top_3_data = [[score, count, [question_num, ...]], [score, count, [question_num, ...]], [score, count, [question_num, ...]]]
+        top_3_data = []
+        for _ in range(0, 3):
+            top_3_data.append([-1, 0, [0,]])
+        # anwser_choice = [int(x) for x in anwser_choice]  # 将str选项转成对应的分数
+        for question_num, choice in zip(anwser_choice, question_num):
+            choice = int(choice)
+            for i, top_data in enumerate(top_3_data):
+                if choice > top_data[0]:
+                    # 去掉最后一个
+                    top_data.pop()
+                    # 把最新的值插入
+                    top_data = [[choice, 1, [question_num,]]].extend(top_data)
+                elif choice == top_data[0]:
+                    # 更新数量与记录该值
+                    top_data[1] += 1
+                    top_data[2].append(question_num)
+                    break
         pass
-    return render(request, 'career_test/test_result.html', context)
+        # 题目数递增8
+        # 计算1、9、17、25、33的总分
+        pass
+        # 计算2、10、18、26、34的总分
+        pass
+        # 计算3、11、19、27、35的总分
+        pass
+        # 计算4、12、20、28、36的总分
+        pass
+        # 计算5、13、21、29、37的总分
+        pass
+        # 计算6、14、22、30、38的总分
+        pass
+        # 计算7、15、23、31、39的总分
+        pass
+        # 计算8、16、24、32、40的总分
+        pass
+        # 将数据传到结果界面
+        return render(request, 'career_test/career_result.html', context)
