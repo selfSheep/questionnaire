@@ -47,25 +47,20 @@ def handle_anwser(request):
         return render(request, 'career_test/mbti_result.html', context)
     else:
         # 统计前三个最高分的选项，若出现同分，则询问用户更加喜爱哪个题目
-        # question_num, anwser_choice
-        # top_3_data = [[score, count, [question_num, ...]], [score, count, [question_num, ...]], [score, count, [question_num, ...]]]
-        top_3_data = []
-        for _ in range(0, 3):
-            top_3_data.append([-1, 0, [0,]])
-        # anwser_choice = [int(x) for x in anwser_choice]  # 将str选项转成对应的分数
-        for question_num, choice in zip(anwser_choice, question_num):
+        # print(request.POST)
+        # 统计个得分的个数及题号
+        score_count = []  # [[score, count, [question_num, ...]], ...]
+        for i in range(1, 7):
+            score_count.append([i, 0, []])
+        for choice, question_num in zip(anwser_choice, question_num):
             choice = int(choice)
-            for i, top_data in enumerate(top_3_data):
-                if choice > top_data[0]:
-                    # 去掉最后一个
-                    top_data.pop()
-                    # 把最新的值插入
-                    top_data = [[choice, 1, [question_num,]]].extend(top_data)
-                elif choice == top_data[0]:
-                    # 更新数量与记录该值
-                    top_data[1] += 1
-                    top_data[2].append(question_num)
+            for score_data in score_count:
+                if choice == score_data[0]:
+                    score_data[1] += 1
+                    score_data[2].append(question_num)
                     break
+        print(score_count)
+        # 选出高分三个，同分则返回相应处理页面
         pass
         # 题目数递增8
         # 计算1、9、17、25、33的总分
