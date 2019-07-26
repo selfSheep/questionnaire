@@ -1,0 +1,125 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+
+{# 标题 #}
+{% block title %}
+    职业锚测试
+{% endblock %}
+
+{# 标题栏高亮 #}
+{% block nav_home_active %}
+    active
+{% endblock %}
+
+{# 网页内容 #}
+{% block content %}
+    <div class="starter-template">
+        <div class="container" id="top">
+            <h1 id="CheckedAll">
+                职业锚测试
+            </h1>
+            <br>
+            <h2>请选择你比较感兴趣的{{ top_3 }}个</h2>
+            <div class="btn-group-vertical" role="group" aria-label="Vertical button group">
+                <div class="btn-group" role="group">
+                {% for item in question_num_and_name %}
+                    <label class="btn btn-default">
+                        {# 使用html代码 #}
+                        {% autoescape off %}
+                        <input type="checkbox" class="checkbox_choice" name="{{ item.0 }}" value="{{ item.0 }}">{{ item.0 }}.{{ item.1 }}              
+                        {% endautoescape %}
+                    </label>
+                {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="starter-template">
+        <div class="container">
+            <button id="over_btn" class="btn btn-block btn-success" type="button" onclick="test_finished()" style="display:none;">完成</button>
+        </div>
+        <br>
+    </div>
+{% endblock %}
+
+{# 代码区域 #}
+{% block script %}
+    <script type="text/javascript">
+        // 用于记录复选框选中的个数
+        var tag_checkbox = 0
+        // 记录已选中的队列
+        var choice_queue = new Array();
+        var classList = document.getElementsByClassName("checkbox_choice");
+        for (var i = 0; i < classList.length; i++) {
+            // 往每一个复选框添加响应函数
+            classList[i].addEventListener("click", function() {
+                if (this.checked) {
+                    choice_queue.push(this);
+                    // 添加选中标记的类
+                    this.classList.add("tag_choice");
+                    // 若复选框选中个数大于等于规定个数的时候触发
+                    if (tag_checkbox >= parseInt("{{ top_3 }}")) {
+                        target_checkbox = choice_queue.shift();
+                        target_checkbox.checked = false;
+                        // 去除选中标记类
+                        target_checkbox.classList.remove("tag_choice");
+                        return
+                    }
+                    tag_checkbox += 1;
+                    if (tag_checkbox == parseInt("{{ top_3 }}")) {
+                        document.getElementById("over_btn").style.display = "inline";
+                    }
+                }
+                else {
+                    // 获取该队列存储的这个元素的下标
+                    var index = choice_queue.indexOf(this);
+                    // 移除该下标的元素第二个参数表示移除多少位
+                    choice_queue.splice(index, 1);
+                    tag_checkbox -= 1;
+                    if (tag_checkbox < parseInt("{{ top_3 }}")) {
+                        document.getElementById("over_btn").style.display = "none";
+                    }
+                }
+            });
+        }
+        function test_finished() {
+            var tag_choices = document.getElementsByClassName("tag_choice");
+            var question_num_array = new Array();
+            for (var i = 0;  i < tag_choices.length; i++) {
+                question_num_array.push(tag_choices[i].value);
+                // console.log(tag_choices[i].value);
+            }
+            var question_num = JSON.stringify(question_num_array);
+            var parames = new Array();
+            parames.push({ name: "question_num", value: question_num});
+            parames.push({ name: "anwser_choice", value: "{{ anwser_choice }}"});
+            parames.push({ name: "csrfmiddlewaretoken", value: "{{ csrf_token }}"});
+            Post("{% url 'career_result' %}", parames);
+
+            return false;
+        }
+        /*
+        *功能： 模拟form表单的提交
+        *参数： URL 跳转地址 PARAMTERS 参数
+        */
+        function Post(URL, PARAMTERS) {
+            //创建form表单
+            var temp_form = document.createElement("form");
+            temp_form.action = URL;
+            //如需打开新窗口，form的target属性要设置为'_blank'
+            temp_form.target = "_self";
+            temp_form.method = "post";
+            temp_form.style.display = "none";
+            //添加参数
+            for (var item in PARAMTERS) {
+                var opt = document.createElement("textarea");
+                opt.name = PARAMTERS[item].name;
+                opt.value = PARAMTERS[item].value;
+                temp_form.appendChild(opt);
+            }
+            document.body.appendChild(temp_form);
+            //提交数据
+            temp_form.submit();
+        }
+    </script>
+{% endblock %}

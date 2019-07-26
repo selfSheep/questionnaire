@@ -7,8 +7,12 @@ class QuestionBank(models.Model):
     question_name = models.CharField(max_length=300, verbose_name='题目')
     
     @staticmethod
-    def get_question(bank_name):
-        questions = QuestionBank.objects.filter(bank_name=bank_name).order_by('question_num')
+    def get_question(bank_name, questions_num=None):
+        if not questions_num:
+            questions = QuestionBank.objects.filter(bank_name=bank_name).order_by('question_num')
+        else:
+            questions = QuestionBank.objects.filter(bank_name=bank_name, question_num__in=questions_num).order_by('question_num')
+            return questions
         question_and_choice = []
         for question in questions:
             choices = question.choice_set.all().order_by('choice_type')
@@ -18,6 +22,8 @@ class QuestionBank(models.Model):
             question_and_choice.append(((question.question_num, question.question_name), choice_detail))
         # question_and_choice = [((题号, 题目), [(选项号, 选项内容), (选项号, 选项内容)]), ((题号, 题目), [(选项号, 选项内容), (选项号, 选项内容)]), ...]
         return question_and_choice
+
+
 
     def __str__(self):
         return '<QuestionBank: {}题目{} 题库名{}>'.format(self.question_num, self.question_name, self.bank_name)
@@ -74,3 +80,13 @@ class MBTIResultDetail(models.Model):
     result_type = models.ForeignKey(MBTIResult, on_delete=models.CASCADE)
     result_num = models.IntegerField(verbose_name='结果号')
     result_content = models.CharField(max_length=100, verbose_name='结果内容')
+
+
+class CareerResultType(models.Model):
+    type_name = models.CharField(max_length=2, verbose_name='结果类型')
+    type_title = models.CharField(max_length=100, verbose_name='结果标题')
+    type_content = models.CharField(max_length=500, verbose_name='结果内容')
+
+    @staticmethod
+    def get_career_result(type_names):
+        return CareerResultType.objects.filter(type_name__in=type_names)

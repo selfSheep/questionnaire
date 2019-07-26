@@ -15,17 +15,18 @@
 {% block content %}
     <div class="starter-template">
         <div class="container" id="top">
-            <h1>【MBTI十六种人格类型】结果表</h1>
+            <h4>【MBTI十六种人格类型】结果表</h4>
         </div>
     </div>
-    <br>
     <div class="starter-template">
         <div class="container">
             <h3>你的属于{{ result_str }}型的人</h3>
-            {% for result in final_results %}
-                <br>
-                <h4>{{ result.result_num }}.{{ result.result_content }}</h4>
-            {% endfor %}
+            <div class="well">
+                {% for result in final_results %}
+                    <br>
+                    <h4>{{ result.result_num }}.{{ result.result_content }}</h4>
+                {% endfor %}
+            </div>
         </div>
         <br>
         <a id="over_btn" class="btn btn-block btn-success" type="button" href="{% url 'home' %}">返回主页</a>
