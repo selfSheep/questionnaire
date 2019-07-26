@@ -53,20 +53,32 @@
         for (var i = 0; i < classList.length; i++) {
             // 往每一个复选框添加响应函数
             classList[i].addEventListener("click", function() {
-                choice_queue.push(this);
-                // 添加选中标记的类
-                this.classList.add("tag_choice");
-                // 若复选框选中个数大于等于规定个数的时候触发
-                if (tag_checkbox >= parseInt("{{ top_3 }}")) {
-                    target_checkbox = choice_queue.shift();
-                    target_checkbox.checked = false;
-                    // 去除选中标记类
-                    target_checkbox.classList.remove("tag_choice");
-                    return
+                if (this.checked) {
+                    choice_queue.push(this);
+                    // 添加选中标记的类
+                    this.classList.add("tag_choice");
+                    // 若复选框选中个数大于等于规定个数的时候触发
+                    if (tag_checkbox >= parseInt("{{ top_3 }}")) {
+                        target_checkbox = choice_queue.shift();
+                        target_checkbox.checked = false;
+                        // 去除选中标记类
+                        target_checkbox.classList.remove("tag_choice");
+                        return
+                    }
+                    tag_checkbox += 1;
+                    if (tag_checkbox == parseInt("{{ top_3 }}")) {
+                        document.getElementById("over_btn").style.display = "inline";
+                    }
                 }
-                tag_checkbox += 1;
-                if (tag_checkbox == parseInt("{{ top_3 }}")) {
-                    document.getElementById("over_btn").style.display = "inline";
+                else {
+                    // 获取该队列存储的这个元素的下标
+                    var index = choice_queue.indexOf(this);
+                    // 移除该下标的元素第二个参数表示移除多少位
+                    choice_queue.splice(index, 1);
+                    tag_checkbox -= 1;
+                    if (tag_checkbox < parseInt("{{ top_3 }}")) {
+                        document.getElementById("over_btn").style.display = "none";
+                    }
                 }
             });
         }

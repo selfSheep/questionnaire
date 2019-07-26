@@ -2,7 +2,7 @@ from django.db.models import Count
 from django.http import JsonResponse
 from django.shortcuts import render
 
-from .models import QuestionBank, Choice, MBTIAnwserType, MBTIResult, MBTIResultDetail
+from .models import QuestionBank, Choice, MBTIAnwserType, MBTIResult, MBTIResultDetail, CareerResultType
 
 
 def test_page(request, test_type):
@@ -70,7 +70,7 @@ def handle_anwser(request):
         top_3 = 3
         for score_data in score_count[::-1]:
             if score_data[1] > top_3:
-                print(anwser_choice)
+                # print(anwser_choice)
                 # 根据题库名以及题号数选出题目数据
                 # context['questions'] = QuestionBank.get_question(bank_name=bank_name, questions_num=score_data[2])
                 questions = QuestionBank.get_question(bank_name=bank_name, questions_num=score_data[2])
@@ -90,56 +90,88 @@ def handle_anwser(request):
                 context['top_3'] = top_3
                 return render(request, 'career_test/career_choice.html', context)
             elif score_data[1] == top_3:
-                # 实现选项 +3 操作
+                # 实现选项 +4 操作
                 for i in score_data[2]:
-                    anwser_choice[i - 1] += 3
+                    anwser_choice[i - 1] += 4
                 break
             elif score_data[1] > 0 and score_data[1] < top_3:
-                # 实现选项 +3 操作
+                # 实现选项 +4 操作
                 for i in score_data[2]:
-                    anwser_choice[i - 1] += 3
+                    anwser_choice[i - 1] += 4
                 top_3 -= score_data[1]
         # print(anwser_choice)
         # 将数据传到结果界面
+        # 选出最大值的列表
+        # result_type_list = [['TF', 0], ['GM', 0], ['AU', 0], ['SE', 0], ['EC', 0], ['SV', 0], ['CH', 0], ['LS', 0]]
+        # # 题目数递增8
+        # for q_num in range(0, 8):
+        #     for add_num in range(0, 5):
+        #         result_type_list[q_num][1] += anwser_choice[q_num + 8 * add_num]
+        #     max_list = [-1, []]
+        # for result_type in result_type_list:
+        #     if max_list[0] < result_type[1]:
+        #         max_list = [result_type[1], [result_type[0]]]
+        #     elif max_list[0] == result_type[1]:
+        #         max_list[1].append(result_type[0])
+        # career_result = CareerResultType.get_career_result(type_names=max_list[1])
+        # context['max_list'] = max_list
+        # context['career_result'] = career_result
+        get_max_list_and_career_result(anwser_choice, context)
         return render(request, 'career_test/career_result.html', context)
 
-
+# 职业锚后半部分处理结果
 def career_result(request):
     question_num = eval(request.POST.get('question_num', ''))
     question_num = [int(x) for x in question_num]
     anwser_choice = eval(request.POST.get('anwser_choice', ''))
     anwser_choice = [int(x) for x in anwser_choice]
-
+    # anwser_choice用来存放各题分数
+    # 执行相关题目分数加4
     for add_score in question_num:
         anwser_choice[add_score - 1] += 4
 
-    result_type_dict = {
-        'TF': [1, 9, 17, 25, 33],
-        'GM': [2, 10, 18, 26, 34],
-        'AU': [3, 11, 19, 27, 35],
-        'SE': [4, 12, 20, 28, 36],
-        'EC': [5, 13, 21, 29, 37],
-        'SV': [6, 14, 22, 30, 38],
-        'CH': [7, 15, 23, 31, 39],
-        'LS': [8, 16, 24, 32, 40],
-    }
-    # 题目数递增8
-    # 计算1、9、17、25、33的总分
-    pass
-    # 计算2、10、18、26、34的总分
-    pass
-    # 计算3、11、19、27、35的总分
-    pass
-    # 计算4、12、20、28、36的总分
-    pass
-    # 计算5、13、21、29、37的总分
-    pass
-    # 计算6、14、22、30、38的总分
-    pass
-    # 计算7、15、23、31、39的总分
-    pass
-    # 计算8、16、24、32、40的总分
-    pass
+    # print(len(anwser_choice))
+    # result_type_list用来存放各类型的分数总和
+    # result_type_list = [['TF', 0], ['GM', 0], ['AU', 0], ['SE', 0], ['EC', 0], ['SV', 0], ['CH', 0], ['LS', 0]]
+    # # 题目数递增8
+    # for q_num in range(0, 8):
+    #     for add_num in range(0, 5):
+    #         result_type_list[q_num][1] += anwser_choice[q_num + 8 * add_num]
+    # # print(result_type_list)
+    # # 选出最大值的列表
+    # max_list = [-1, []]
+    # for result_type in result_type_list:
+    #     if max_list[0] < result_type[1]:
+    #         max_list = [result_type[1], [result_type[0]]]
+    #     elif max_list[0] == result_type[1]:
+    #         max_list[1].append(result_type[0])
+    # # print(max_list)
+    # career_result = CareerResultType.get_career_result(type_names=max_list[1])
+    # print(career_result)
     context = dict()
+    # context['max_list'] = max_list
+    # context['career_result'] = career_result
+    get_max_list_and_career_result(anwser_choice, context)
     return render(request, 'career_test/career_result.html', context)
 
+
+def get_max_list_and_career_result(anwser_choice, context):
+    # result_type_list用来存放各类型的分数总和
+    result_type_list = [['TF', 0], ['GM', 0], ['AU', 0], ['SE', 0], ['EC', 0], ['SV', 0], ['CH', 0], ['LS', 0]]
+    # 题目数递增8
+    for q_num in range(0, 8):
+        for add_num in range(0, 5):
+            result_type_list[q_num][1] += anwser_choice[q_num + 8 * add_num]
+    # print(result_type_list)
+    # 选出最大值的列表
+    max_list = [-1, []]
+    for result_type in result_type_list:
+        if max_list[0] < result_type[1]:
+            max_list = [result_type[1], [result_type[0]]]
+        elif max_list[0] == result_type[1]:
+            max_list[1].append(result_type[0])
+    # print(max_list)
+    career_result = CareerResultType.get_career_result(type_names=max_list[1])
+    # print(career_result)
+    context['max_list'] = max_list
+    context['career_result'] = career_result

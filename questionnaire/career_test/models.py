@@ -80,3 +80,13 @@ class MBTIResultDetail(models.Model):
     result_type = models.ForeignKey(MBTIResult, on_delete=models.CASCADE)
     result_num = models.IntegerField(verbose_name='结果号')
     result_content = models.CharField(max_length=100, verbose_name='结果内容')
+
+
+class CareerResultType(models.Model):
+    type_name = models.CharField(max_length=2, verbose_name='结果类型')
+    type_title = models.CharField(max_length=100, verbose_name='结果标题')
+    type_content = models.CharField(max_length=500, verbose_name='结果内容')
+
+    @staticmethod
+    def get_career_result(type_names):
+        return CareerResultType.objects.filter(type_name__in=type_names)
