@@ -10,11 +10,6 @@
     {% endif %}
 {% endblock %}
 
-{# 标题栏高亮 #}
-{% block nav_home_active %}
-    active
-{% endblock %}
-
 {# 网页内容 #}
 {% block content %}
     <div class="starter-template">
@@ -135,6 +130,7 @@
             show_questions();
             // 点击完之后隐藏下一页按钮
             document.getElementById("next_btn").style.display = "none";
+            // 置顶
             window.scrollTo(0, 0);
         }
 

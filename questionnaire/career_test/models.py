@@ -96,6 +96,10 @@ class HollandData(models.Model):
     part_num = models.IntegerField(verbose_name='号码')
     part_title = models.CharField(max_length=30, verbose_name='标题')
 
+    @staticmethod
+    def get_holland_data(part_num):
+        return HollandData.objects.get(part_num=part_num)
+
     def __str__(self):
         return '<id:{} HollandData: {}>'.format(self.id, self.part_title)
 
@@ -105,3 +109,20 @@ class HollandDataItem(models.Model):
     part_type = models.CharField(max_length=2, verbose_name='类型')
     content = models.CharField(max_length=100, verbose_name='内容')
     part = models.ForeignKey(HollandData, on_delete=models.CASCADE)
+
+    @staticmethod
+    def get_holland_data_item(part, part_type):
+        return HollandDataItem.objects.filter(part=part, part_type=part_type).order_by('item_num')
+
+    def __str__(self):
+        return '< id:{} item_num: {} part_type: {} >'.format(self.id, self.item_num, self.part_type)
+
+
+class HollandTypeResult(models.Model):
+    result_type = models.CharField(max_length=2, verbose_name='类型')
+    result_title = models.CharField(max_length=30, verbose_name='标题')
+    result_detail = models.CharField(max_length=300, verbose_name='内容')
+
+    @staticmethod
+    def get_type_result(result_type):
+        return HollandTypeResult.objects.filter(result_type__in=result_type)        
