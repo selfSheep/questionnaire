@@ -90,3 +90,18 @@ class CareerResultType(models.Model):
     @staticmethod
     def get_career_result(type_names):
         return CareerResultType.objects.filter(type_name__in=type_names)
+
+
+class HollandData(models.Model):
+    part_num = models.IntegerField(verbose_name='号码')
+    part_title = models.CharField(max_length=30, verbose_name='标题')
+
+    def __str__(self):
+        return '<id:{} HollandData: {}>'.format(self.id, self.part_title)
+
+
+class HollandDataItem(models.Model):
+    item_num = models.IntegerField(verbose_name='号码')
+    part_type = models.CharField(max_length=2, verbose_name='类型')
+    content = models.CharField(max_length=100, verbose_name='内容')
+    part = models.ForeignKey(HollandData, on_delete=models.CASCADE)

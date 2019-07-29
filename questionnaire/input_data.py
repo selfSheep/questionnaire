@@ -1,6 +1,6 @@
 import os
 
-from career_test.models import QuestionBank, Choice, MBTIAnwserType
+from career_test.models import QuestionBank, Choice, MBTIAnwserType, HollandData, HollandDataItem
 
 
 
@@ -93,3 +93,51 @@ def input_anwser_type():
                 count_num += 1
                 # print('{}{}'.format(questions.choice_set.get(choice_type='B'), line.replace('\n', '')))
     print('录入成功')
+
+
+
+def input_holland_data():
+    is_part = False
+    is_title = False
+    is_type = False
+    # is_item = False
+    item_type = None
+    # part_num = None
+    with open('预处理数据/霍兰德题目.txt', 'r', encoding='UTF-8') as f:
+        holland_data = None
+        item_num = 0
+        for line in f.readlines():
+            line_content = line.replace('\n', '')
+            if line_content == 'part':
+                is_part = True
+                holland_data = HollandData()
+                continue
+            if is_part:
+                holland_data.part_num = line_content
+                is_part = False
+                continue
+            if line_content == 'title':
+                is_title = True
+                continue
+            if is_title:
+                holland_data.part_title = line_content
+                is_title = False
+                holland_data.save()
+                continue
+            if line_content == 'type':
+                is_type = True
+                continue
+            if is_type:
+                item_type = line_content
+                is_type = False
+                # is_item = True
+                continue
+            item_num += 1
+            holland_data_item = HollandDataItem()
+            holland_data_item.item_num = item_num
+            holland_data_item.part_type = item_type
+            holland_data_item.content = line_content
+            holland_data_item.part = holland_data
+            holland_data_item.save()
+    print('录入成功')
+
