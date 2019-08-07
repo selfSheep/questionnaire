@@ -102,13 +102,17 @@
         // 显示前五题
         function show_questions() {
             var i = 0;
+            // 进度条
+            var progress_bar = document.getElementById("progress_bar");
             for (i = last_num; i < last_num + 5; i++) {
                 if (!is_last_page && last_num + 5 == questions.length) {
                     // 标记目前是最后一页
+                    progress_bar.classList.add("progress-bar-success");
                     is_last_page = true;
                 }
                 if (i >= questions.length) {
                     // 标记目前是最后一页
+                    progress_bar.classList.add("progress-bar-success");
                     is_last_page = true;
                     break;
                 }
@@ -118,7 +122,7 @@
             last_num = i;
             // 设置进度条显示
             current_progress += last_num - start_num;
-            document.getElementById("progress_bar").style.width = current_progress / total_progress * 100 + "%";
+            progress_bar.style.width = current_progress / total_progress * 100 + "%";
         }
 
         // 点击下一页触发的函数

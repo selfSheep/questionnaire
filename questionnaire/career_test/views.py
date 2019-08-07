@@ -2,7 +2,12 @@ from django.db.models import Count
 from django.http import JsonResponse
 from django.shortcuts import render
 
-from .models import QuestionBank, Choice, MBTIAnwserType, MBTIResult, MBTIResultDetail, CareerResultType, HollandData, HollandDataItem, HollandTypeResult
+from .models import (
+    QuestionBank, Choice, MBTIAnwserType,
+    MBTIResult, MBTIResultDetail, CareerResultType,
+    HollandData, HollandDataItem, HollandTypeResult,
+    NewHolland, NewHollandType, NewHollandTitleNumType
+)
 
 
 def test_page(request, test_type):
@@ -193,3 +198,21 @@ def holland_result(request):
     context['user_input_6'] = user_input_6
     context['result_content'] = result_content
     return render(request, 'career_test/holland_result.html', context)
+
+
+def new_holland_test(request):
+    context = dict()
+    context['title_info_result'] = NewHolland.get_all_title()
+    context['question_len'] = context['title_info_result'].count()
+    return render(request, 'career_test/new_holland_test.html', context)
+
+
+def new_holland_result(request):
+    # 获取选中的题号
+    tag_choice = eval(request.POST.get('tag_choice', ''))
+    tag_choice = [int(x) for x in tag_choice]
+    # choice_info_dic = NewHollandTitleNumType.get_new_holland_title_num_type(NewHolland.get_new_holland_list(tag_choice))
+    choice_info_dic = NewHollandTitleNumType.get_new_holland_title_num_type(tag_choice)
+    print(choice_info_dic)
+    context = dict()
+    return render(request, 'career_test/new_holland_result.html', context)

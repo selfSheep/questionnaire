@@ -1,7 +1,11 @@
 import os
 
-from career_test.models import QuestionBank, Choice, MBTIAnwserType, HollandData, HollandDataItem
-
+from career_test.models import (
+    QuestionBank, Choice, MBTIAnwserType,
+    MBTIResult, MBTIResultDetail, CareerResultType,
+    HollandData, HollandDataItem, HollandTypeResult,
+    NewHolland, NewHollandType, NewHollandTitleNumType
+)
 
 
 def input_questions():
@@ -141,3 +145,37 @@ def input_holland_data():
             holland_data_item.save()
     print('录入成功')
 
+
+def input_new_holland_title():
+    with open('预处理数据/新霍兰德测试题目.txt', 'r', encoding='UTF-8') as f:
+        for i, line in enumerate(f.readlines()):
+            holland_data_item = NewHolland()
+            holland_data_item.title_num = i + 1
+            holland_data_item.title = line.replace('\n', '')
+            holland_data_item.save()
+    print('录入成功')
+
+
+def input_condition():
+    type_dic = dict()
+    type_dic['传统型'] = ((7, 19, 29, 39, 41, 51, 57), (5, 18, 40))
+    type_dic['现实型'] = ((2, 13, 22, 36, 43), (14, 23, 44, 47, 48))
+    type_dic['研究型'] = ((6, 8, 20, 30, 31, 42), (21, 55, 56, 58))
+    type_dic['企业型'] = ((11, 24, 28, 35, 38, 46, 60), (3, 16, 25))
+    type_dic['社会型'] = ((26, 37, 52, 59), (1, 12, 15, 27, 45, 53))
+    type_dic['艺术型'] = ((4, 9, 10, 17, 33, 34, 49, 50, 54), (32, ))
+
+    for key, value in type_dic.items():
+        for true_num in value[0]:
+            new_item = NewHollandTitleNumType()
+            new_item.new_holland = NewHolland.objects.get(title_num=true_num)
+            new_item.new_holland_type = NewHollandType.objects.get(item_name=key)
+            new_item.save()
+        for false_num in value[1]:
+            new_item = NewHollandTitleNumType()
+            new_item.new_holland = NewHolland.objects.get(title_num=true_num)
+            new_item.new_holland_type = NewHollandType.objects.get(item_name=key)
+            new_item.score_condition = False
+            new_item.save()
+        print('成功录入一类')
+    print('录入成功')
