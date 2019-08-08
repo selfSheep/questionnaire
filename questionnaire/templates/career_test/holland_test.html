@@ -1,0 +1,377 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+
+{# 标题 #}
+{% block title %}
+    霍兰德职业兴趣测试
+{% endblock %}
+
+{# 标题栏高亮 #}
+{% block nav_holland_test_active %}
+    active
+{% endblock %}
+
+{# 网页内容 #}
+{% block content %}
+    <div class="starter-template">
+        <div class="container" id="top">
+            <h1 id="CheckedAll">霍兰德职业兴趣测试</h1>
+            <br>
+            <div class="container">
+                <div class="progress">
+                    <div id="progress_bar" class="progress-bar progress-bar-striped progress-bar-success" role="progressbar" style="width: 0%"></div>
+                </div>
+            </div>
+            <div id="part_1">
+                <h2>请写出3个你心目中的理想职业或专业</h2>
+                <div class="btn-group-vertical" role="group" aria-label="Vertical button group">
+                    <div class="btn-group" role="group">
+                        <label class="btn btn-default">
+                            1:<input class="user_input_1" name="part_1_1" value="">
+                        </label>
+                        <label class="btn btn-default">
+                            2:<input class="user_input_1" name="part_1_2" value="">
+                        </label>
+                        <label class="btn btn-default">
+                            3:<input class="user_input_1" name="part_1_3" value="">
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div id="part_2" style="display:none;">
+            <h2>勾选出 {{ part_2_data.part_title }}</h2>
+                <div class="btn-group-vertical" role="group" aria-label="Vertical button group">
+                    <div class="btn-group" role="group">
+                    {% for part_2_data_list_item in part_2_data_list %}
+                        <label>{{ part_2_data_list_item.0 }}</label>
+                        {% for holland_data_item in part_2_data_list_item.1 %}
+                            <label class="btn btn-default">
+                                <input type="checkbox" class="checkbox_choice" value="{{ part_2_data_list_item.0 }}">{{ holland_data_item.content }}          
+                            </label>
+                        {% endfor %}
+                    {% endfor %}
+                    </div>
+                </div>
+            </div>
+            <div id="part_3" style="display:none;">
+            <h2>勾选出 {{ part_3_data.part_title }}</h2>
+                <div class="btn-group-vertical" role="group" aria-label="Vertical button group">
+                    <div class="btn-group" role="group">
+                    {% for part_3_data_list_item in part_3_data_list %}
+                        <label>{{ part_3_data_list_item.0 }}</label>
+                        {% for holland_data_item in part_3_data_list_item.1 %}
+                            <label class="btn btn-default">
+                                <input type="checkbox" class="checkbox_choice" value="{{ part_3_data_list_item.0 }}">{{ holland_data_item.content }}          
+                            </label>
+                        {% endfor %}
+                    {% endfor %}
+                    </div>
+                </div>
+            </div>
+            <div id="part_4" style="display:none;">
+            <h2>勾选出 {{ part_4_data.part_title }}</h2>
+                <div class="btn-group-vertical" role="group" aria-label="Vertical button group">
+                    <div class="btn-group" role="group">
+                    {% for part_4_data_list_item in part_4_data_list %}
+                        <label>{{ part_4_data_list_item.0 }}</label>
+                        {% for holland_data_item in part_4_data_list_item.1 %}
+                            <label class="btn btn-default">
+                                <input type="checkbox" class="checkbox_choice" value="{{ part_4_data_list_item.0 }}">{{ holland_data_item.content }}          
+                            </label>
+                        {% endfor %}
+                    {% endfor %}
+                    </div>
+                </div>
+            </div>
+            <div id="part_5" style="display:none;">
+            <h2>{{ part_5_data.part_title }}</h2>
+                <div class="btn-group-vertical" role="group" aria-label="Vertical button group">
+                    <div class="btn-group" role="group">
+                    {% for part_5_data_list_item in part_5_data_list %}
+                        <label>{{ part_5_data_list_item.0 }}</label>
+                        {% for holland_data_item in part_5_data_list_item.1 %}
+                            <label class="btn">
+                                {{ holland_data_item.content }}          
+                            </label>
+                            <select class="form-control {{ part_5_data_list_item.0 }}_select">
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                                <option value="6">6</option>
+                                <option value="7">7</option>
+                            </select>
+                        {% endfor %}
+                    {% endfor %}
+                    </div>
+                </div>
+            </div>
+            <div id="part_6" style="display:none;">
+            <h2>请你选出对你来说最重要的2个因素</h2>
+                <div class="btn-group-vertical" role="group" aria-label="Vertical button group">
+                    <div class="btn-group" role="group">
+                            <label class="btn btn-default">
+                                <input type="checkbox" class="checkbox_choice_end" value="工资高、福利好">1.工资高、福利好
+                            </label>
+                            <label class="btn btn-default">
+                                <input type="checkbox" class="checkbox_choice_end" value="工作环境（物质方面）舒适">
+                                2.工作环境（物质方面）舒适
+                            </label>
+                            <label class="btn btn-default">
+                                <input type="checkbox" class="checkbox_choice_end" value="人际关系良好">
+                                3.人际关系良好
+                            </label>
+                            <label class="btn btn-default">
+                                <input type="checkbox" class="checkbox_choice_end" value="工作稳定有保证">
+                                4.工作稳定有保证
+                            </label>
+                            <label class="btn btn-default">
+                                <input type="checkbox" class="checkbox_choice_end" value="能提供较好的受教育机会">
+                                5.能提供较好的受教育机会
+                            </label>
+                            <label class="btn btn-default">
+                                <input type="checkbox" class="checkbox_choice_end" value="有较高的社会地位">
+                                6.有较高的社会地位
+                            </label>
+                            <label class="btn btn-default">
+                                <input type="checkbox" class="checkbox_choice_end" value="工作不太紧张、外部压力少">
+                                7.工作不太紧张、外部压力少
+                            </label>
+                            <label class="btn btn-default">
+                                <input type="checkbox" class="checkbox_choice_end" value="能充分发挥自己的能力特长">
+                                8.能充分发挥自己的能力特长
+                            </label>
+                            <label class="btn btn-default">
+                                <input type="checkbox" class="checkbox_choice_end" value="社会需要与社会贡献大">
+                                9.社会需要与社会贡献大
+                            </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="starter-template">
+        <div class="container">
+            <button id="next_btn" class="btn btn-block btn-primary" type="button" onclick="part_close()" style="display:none;">下一项</button>
+        </div>
+        <div class="container">
+            <button id="over_btn" class="btn btn-block btn-success" type="button" onclick="test_finished()" style="display:none;">完成</button>
+        </div>
+        <br>
+    </div>
+{% endblock %}
+
+{# 代码区域 #}
+{% block script %}
+    <script type="text/javascript">
+        // 将后台数据转成数组
+        var part_type_temp = "{{ part_type|safe }}";
+        // 字符串替换以及字符串转数组 ['R', 'I', 'A', 'S', 'E', 'C']
+        var part_type = part_type_temp.replace(/\[/g, '').replace(/\]/g, '').replace(/'/g, '').replace(/ /g, '').split(',');
+
+        // 用于存储各类总分的数组
+        var score_array = null;
+        var index_array = null;
+        var checkbox_choice = document.getElementsByClassName("checkbox_choice");
+        // 选中一个选项就往改选项添加个所属类型的class
+        // 给选项按钮添加点击事件
+        for (var i = 0; i < checkbox_choice.length; i++) {
+            // 往每一个复选框添加响应函数
+            checkbox_choice[i].addEventListener("click", function() {
+                if (this.checked) {
+                    // 添加选中标记的类
+                    this.classList.add(this.value);
+                }
+                else {
+                    // 移除取消选中标记的类
+                    this.classList.remove(this.value);
+                }
+            });
+        }
+        // 分别统计class所有类型含有的个数
+        function get_type_count() {
+            for (var i = 0; i < part_type.length; i++) {
+                // 按照列表顺序存着相应得分['R', 'I', 'A', 'S', 'E', 'C']
+                score_array.push(document.getElementsByClassName(part_type[i]).length);
+            }
+        }
+        // 分别统计各类型的自我评分
+        function get_score() {
+            for (var i = 0; i < part_type.length; i++) {
+                var select_obj = document.getElementsByClassName(part_type[i] + "_select");
+                var obj_value = 0;
+                for (var j = 0; j < select_obj.length; j++) {
+                    var index  = select_obj[j].selectedIndex;
+                    obj_value += parseInt(select_obj[j].options[index].value);
+                }
+                // 按照列表顺序加上相应得分['R', 'I', 'A', 'S', 'E', 'C']
+                score_array[i] += obj_value;
+            }
+        }
+        // 找出最高分索引值
+        function get_top_index() {
+            score_array = new Array();  // 初始化分数数组
+            get_type_count();  // 分别统计class所有类型含有的个数
+            get_score();  // 分别统计各类型的自我评分
+
+            // for循环找出最高分的索引数组
+            index_array = new Array();
+            var temp_max = score_array[0];
+            for(var i = 0; i < score_array.length; i ++){
+                if (score_array[i] < temp_max) {
+                    continue;
+                }
+                if(score_array[i] > temp_max){
+                    index_array = new Array();
+                    temp_max = score_array[i];
+                }
+                index_array.push(i);
+            }
+
+            console.log(index_array);
+        
+        }
+        function test_finished() {
+            // 处理用户输入的数据
+            // 处理第1部分的用户输入数据
+            var part_1_input = document.getElementsByClassName("user_input_1");
+            var user_input_1_array = new Array();
+            for (var i = 0;  i < part_1_input.length; i++) {
+                user_input_1_array.push(part_1_input[i].value);
+            }
+            var user_input_1 = JSON.stringify(user_input_1_array);
+            // 处理第6部分的用户输入数据
+            var tag_choices = document.getElementsByClassName("tag_choice");
+            var user_input_6_array = new Array();
+            for (var i = 0;  i < tag_choices.length; i++) {
+                user_input_6_array.push(tag_choices[i].value);
+            }
+            var user_input_6 = JSON.stringify(user_input_6_array);
+
+            get_top_index();
+            var index_array_json = JSON.stringify(index_array);
+            var parames = new Array();
+            parames.push({ name: "user_input_1", value: user_input_1});
+            parames.push({ name: "user_input_6", value: user_input_6});
+            parames.push({ name: "index_array", value: index_array_json});
+            parames.push({ name: "csrfmiddlewaretoken", value: "{{ csrf_token }}"});
+            Post("{% url 'holland_result' %}", parames);
+
+            return false;
+        }
+        /*
+        *功能： 模拟form表单的提交
+        *参数： URL 跳转地址 PARAMTERS 参数
+        */
+        function Post(URL, PARAMTERS) {
+            //创建form表单
+            var temp_form = document.createElement("form");
+            temp_form.action = URL;
+            //如需打开新窗口，form的target属性要设置为'_blank'
+            temp_form.target = "_self";
+            temp_form.method = "post";
+            temp_form.style.display = "none";
+            //添加参数
+            for (var item in PARAMTERS) {
+                var opt = document.createElement("textarea");
+                opt.name = PARAMTERS[item].name;
+                opt.value = PARAMTERS[item].value;
+                temp_form.appendChild(opt);
+            }
+            document.body.appendChild(temp_form);
+            //提交数据
+            temp_form.submit();
+        }
+    </script>
+    <!-- 处理按钮的代码 -->
+    <script type="text/javascript">
+        var is_inline = false;
+        var part_num = 1;
+        var bar_progress = 0;
+        var add_progress = 1 / 6;
+        bar_progress += add_progress;
+        function check_input_all() {
+            var next_btn = document.getElementById("next_btn");
+            var classList = document.getElementsByClassName("user_input_1");
+            for (var i = 0; i < classList.length; i++) {
+                if (classList[i].value == "") {
+                    if (is_inline) {
+                        is_inline = false;
+                        next_btn.style.display = "none";
+                    }
+                    return false;
+                }
+            }
+            if (!is_inline) {
+                is_inline = true;
+                next_btn.style.display = "inline";
+            }
+        }
+        // 用定时器检测part_1的输入情况
+        var time_count = window.setInterval(check_input_all, 100);
+        // 设置进度条显示
+        document.getElementById("progress_bar").style.width = bar_progress * 100 + "%";
+        function part_close() {
+            if (part_num == 1) {
+                // 关闭定时器
+                window.clearInterval(time_count);
+            }
+            document.getElementById('part_' + part_num).style.display = "none";
+            part_num += 1;
+            document.getElementById('part_' + part_num).style.display = "inline";
+            // 页面置顶
+            window.scrollTo(0, 0);
+            bar_progress += add_progress;
+            document.getElementById("progress_bar").style.width = bar_progress * 100 + "%";
+            // 最后一个部分就显示完成按钮
+            if (part_num >= 6) {
+                var next_btn = document.getElementById("next_btn");
+                next_btn.style.display = "none";
+                // var over_btn = document.getElementById("over_btn");
+                // over_btn.style.display = "inline";
+                return false;
+            }
+        }
+    </script>
+    <!-- 限制checkbox的选择数量 -->
+    <script type="text/javascript">
+        // 用于记录复选框选中的个数
+        var tag_checkbox = 0
+        // 记录已选中的队列
+        var choice_queue = new Array();
+        var classList = document.getElementsByClassName("checkbox_choice_end");
+        for (var i = 0; i < classList.length; i++) {
+            // 往每一个复选框添加响应函数
+            classList[i].addEventListener("click", function() {
+                if (this.checked) {
+                    choice_queue.push(this);
+                    // 添加选中标记的类
+                    this.classList.add("tag_choice");
+                    // 若复选框选中个数大于等于规定个数的时候触发
+                    if (tag_checkbox >= parseInt("2")) {
+                        target_checkbox = choice_queue.shift();
+                        target_checkbox.checked = false;
+                        // 去除选中标记类
+                        target_checkbox.classList.remove("tag_choice");
+                        return
+                    }
+                    tag_checkbox += 1;
+                    if (tag_checkbox == parseInt("2")) {
+                        document.getElementById("over_btn").style.display = "inline";
+                    }
+                }
+                else {
+                    // 获取该队列存储的这个元素的下标
+                    var index = choice_queue.indexOf(this);
+                    // 移除该下标的元素第二个参数表示移除多少位
+                    choice_queue.splice(index, 1);
+                    tag_checkbox -= 1;
+                    if (tag_checkbox < parseInt("2")) {
+                        document.getElementById("over_btn").style.display = "none";
+                    }
+                }
+            });
+        }
+    </script>
+{% endblock %}

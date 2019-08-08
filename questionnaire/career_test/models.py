@@ -96,6 +96,10 @@ class HollandData(models.Model):
     part_num = models.IntegerField(verbose_name='号码')
     part_title = models.CharField(max_length=30, verbose_name='标题')
 
+    @staticmethod
+    def get_holland_data(part_num):
+        return HollandData.objects.get(part_num=part_num)
+
     def __str__(self):
         return '<id:{} HollandData: {}>'.format(self.id, self.part_title)
 
@@ -105,3 +109,68 @@ class HollandDataItem(models.Model):
     part_type = models.CharField(max_length=2, verbose_name='类型')
     content = models.CharField(max_length=100, verbose_name='内容')
     part = models.ForeignKey(HollandData, on_delete=models.CASCADE)
+
+    @staticmethod
+    def get_holland_data_item(part, part_type):
+        return HollandDataItem.objects.filter(part=part, part_type=part_type).order_by('item_num')
+
+    def __str__(self):
+        return '< id:{} item_num: {} part_type: {} >'.format(self.id, self.item_num, self.part_type)
+
+
+class HollandTypeResult(models.Model):
+    result_type = models.CharField(max_length=2, verbose_name='类型')
+    result_title = models.CharField(max_length=30, verbose_name='标题')
+    result_detail = models.CharField(max_length=300, verbose_name='内容')
+
+    @staticmethod
+    def get_type_result(result_type):
+        return HollandTypeResult.objects.filter(result_type__in=result_type)
+
+
+class NewHolland(models.Model):
+    title_num = models.IntegerField(verbose_name='号码')
+    title = models.CharField(max_length=50, verbose_name='标题')
+
+    @classmethod
+    def get_all_title(cls):
+         return cls.objects.all()
+
+    # @staticmethod
+    # def get_new_holland_list(num_list):
+    #     return NewHolland.objects.filter(title_num__in=num_list)
+
+    def __str__(self):
+        return '< id:{} title_num: {} title: {} >'.format(self.id, self.title_num, self.title)
+
+
+class NewHollandType(models.Model):
+    TYPE_ITEMS = (
+        ('R', 'R'),
+        ('I', 'I'),
+        ('A', 'A'),
+        ('S', 'S'),
+        ('E', 'E'),
+        ('C', 'C'),
+    )
+
+    item_type = models.CharField(max_length=1, choices=TYPE_ITEMS, verbose_name='类型')
+    item_name = models.CharField(max_length=5, verbose_name='类型名称')
+    personality_tendency = models.CharField(max_length=200, verbose_name='人格倾向')
+    typical_occupation = models.CharField(max_length=100, verbose_name='典型职业')
+
+    def __str__(self):
+        return '< id:{} item_type: {} item_name: {} >'.format(self.id, self.item_type, self.item_name)
+
+
+class NewHollandTitleNumType(models.Model):
+    new_holland = models.ForeignKey(NewHolland, on_delete=models.CASCADE, verbose_name='题号信息')
+    new_holland_type = models.ForeignKey(NewHollandType, on_delete=models.CASCADE, verbose_name='类型信息')
+    score_condition = models.BooleanField(default=True, verbose_name='得分条件信息')
+
+    @staticmethod
+    def get_new_holland_title_num_type(num_list):
+        context = dict()
+        context['select_num'] = NewHolland.objects.filter(title_num__in=num_list)  
+        context['not_select_num'] = NewHolland.objects.exclude(title_num__in=num_list)  
+        return context

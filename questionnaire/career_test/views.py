@@ -2,7 +2,12 @@ from django.db.models import Count
 from django.http import JsonResponse
 from django.shortcuts import render
 
-from .models import QuestionBank, Choice, MBTIAnwserType, MBTIResult, MBTIResultDetail, CareerResultType
+from .models import (
+    QuestionBank, Choice, MBTIAnwserType,
+    MBTIResult, MBTIResultDetail, CareerResultType,
+    HollandData, HollandDataItem, HollandTypeResult,
+    NewHolland, NewHollandType, NewHollandTitleNumType
+)
 
 
 def test_page(request, test_type):
@@ -30,10 +35,6 @@ def handle_anwser(request):
     anwser_choice = eval(request.POST.get('anwser_choice', ''))
     # 分别处理MBTI以及职业锚
     if bank_name == 'MBTI':
-        # print(request.POST)
-        # group_by_type = QuestionBank.objects.filter(bank_name=bank_name, question_num__in=question_num).choice_set.filter(choice_type__in=anwser_choice).mbtianwsertype_set.values('anwser_type').annotate(anwser_type_num=Count('anwser_type'))
-        # question_target = QuestionBank.objects.filter(bank_name=bank_name, question_num__in=question_num)
-        # choice_target = Choice.objects.filter(question__in=question_target, choice_type__in=anwser_choice)
         anwser_targets = []
         for a_choice, q_num in zip(anwser_choice, question_num):
             anwser_targets.append(Choice.objects.get(choice_type=a_choice, question__question_num=q_num))
@@ -99,23 +100,7 @@ def handle_anwser(request):
                 for i in score_data[2]:
                     anwser_choice[i - 1] += 4
                 top_3 -= score_data[1]
-        # print(anwser_choice)
-        # 将数据传到结果界面
-        # 选出最大值的列表
-        # result_type_list = [['TF', 0], ['GM', 0], ['AU', 0], ['SE', 0], ['EC', 0], ['SV', 0], ['CH', 0], ['LS', 0]]
-        # # 题目数递增8
-        # for q_num in range(0, 8):
-        #     for add_num in range(0, 5):
-        #         result_type_list[q_num][1] += anwser_choice[q_num + 8 * add_num]
-        #     max_list = [-1, []]
-        # for result_type in result_type_list:
-        #     if max_list[0] < result_type[1]:
-        #         max_list = [result_type[1], [result_type[0]]]
-        #     elif max_list[0] == result_type[1]:
-        #         max_list[1].append(result_type[0])
-        # career_result = CareerResultType.get_career_result(type_names=max_list[1])
-        # context['max_list'] = max_list
-        # context['career_result'] = career_result
+
         get_max_list_and_career_result(anwser_choice, context)
         return render(request, 'career_test/career_result.html', context)
 
@@ -130,27 +115,8 @@ def career_result(request):
     for add_score in question_num:
         anwser_choice[add_score - 1] += 4
 
-    # print(len(anwser_choice))
-    # result_type_list用来存放各类型的分数总和
-    # result_type_list = [['TF', 0], ['GM', 0], ['AU', 0], ['SE', 0], ['EC', 0], ['SV', 0], ['CH', 0], ['LS', 0]]
-    # # 题目数递增8
-    # for q_num in range(0, 8):
-    #     for add_num in range(0, 5):
-    #         result_type_list[q_num][1] += anwser_choice[q_num + 8 * add_num]
-    # # print(result_type_list)
-    # # 选出最大值的列表
-    # max_list = [-1, []]
-    # for result_type in result_type_list:
-    #     if max_list[0] < result_type[1]:
-    #         max_list = [result_type[1], [result_type[0]]]
-    #     elif max_list[0] == result_type[1]:
-    #         max_list[1].append(result_type[0])
-    # # print(max_list)
-    # career_result = CareerResultType.get_career_result(type_names=max_list[1])
-    # print(career_result)
     context = dict()
-    # context['max_list'] = max_list
-    # context['career_result'] = career_result
+
     get_max_list_and_career_result(anwser_choice, context)
     return render(request, 'career_test/career_result.html', context)
 
@@ -175,3 +141,78 @@ def get_max_list_and_career_result(anwser_choice, context):
     # print(career_result)
     context['max_list'] = max_list
     context['career_result'] = career_result
+
+
+def holland_test(request):
+    context = dict()
+    part_type = ['R', 'I', 'A', 'S', 'E', 'C']
+    part_2_data = HollandData.get_holland_data(2)
+    part_3_data = HollandData.get_holland_data(3)
+    part_4_data = HollandData.get_holland_data(4)
+    part_5_data = HollandData.get_holland_data(5)
+
+    # [(type_str, HollandDataItem), ...]
+    part_2_data_list = []
+    for type_item in part_type:
+        part_2_data_list.append((type_item, HollandDataItem.get_holland_data_item(part=part_2_data, part_type=type_item)))
+
+    context['part_2_data'] = part_2_data
+    context['part_2_data_list'] = part_2_data_list
+
+    part_3_data_list = []
+    for type_item in part_type:
+        part_3_data_list.append((type_item, HollandDataItem.get_holland_data_item(part=part_3_data, part_type=type_item)))
+
+    context['part_3_data'] = part_3_data
+    context['part_3_data_list'] = part_3_data_list
+
+    part_4_data_list = []
+    for type_item in part_type:
+        part_4_data_list.append((type_item, HollandDataItem.get_holland_data_item(part=part_4_data, part_type=type_item)))
+
+    context['part_4_data'] = part_4_data
+    context['part_4_data_list'] = part_4_data_list
+
+    part_5_data_list = []
+    for type_item in part_type:
+        part_5_data_list.append((type_item, HollandDataItem.get_holland_data_item(part=part_5_data, part_type=type_item)))
+
+    context['part_type'] = part_type
+    context['part_5_data'] = part_5_data
+    context['part_5_data_list'] = part_5_data_list
+
+    return render(request, 'career_test/holland_test.html', context)
+
+
+def holland_result(request):
+    part_type = ['R', 'I', 'A', 'S', 'E', 'C']
+    user_input_1 = eval(request.POST.get('user_input_1', ''))
+    user_input_6 = eval(request.POST.get('user_input_6', ''))
+    index_list = eval(request.POST.get('index_array', ''))
+    result_type = []
+    for i in index_list:
+        result_type.append(part_type[i])
+    result_content = HollandTypeResult.get_type_result(result_type=result_type)
+    context = dict()
+    context['user_input_1'] = user_input_1
+    context['user_input_6'] = user_input_6
+    context['result_content'] = result_content
+    return render(request, 'career_test/holland_result.html', context)
+
+
+def new_holland_test(request):
+    context = dict()
+    context['title_info_result'] = NewHolland.get_all_title()
+    context['question_len'] = context['title_info_result'].count()
+    return render(request, 'career_test/new_holland_test.html', context)
+
+
+def new_holland_result(request):
+    # 获取选中的题号
+    tag_choice = eval(request.POST.get('tag_choice', ''))
+    tag_choice = [int(x) for x in tag_choice]
+    # choice_info_dic = NewHollandTitleNumType.get_new_holland_title_num_type(NewHolland.get_new_holland_list(tag_choice))
+    choice_info_dic = NewHollandTitleNumType.get_new_holland_title_num_type(tag_choice)
+    print(choice_info_dic)
+    context = dict()
+    return render(request, 'career_test/new_holland_result.html', context)

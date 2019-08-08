@@ -1,0 +1,159 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+
+{# 标题 #}
+{% block title %}
+    霍兰德职业兴趣测试
+{% endblock %}
+
+{# 标题栏高亮 #}
+{% block nav_holland_test_active %}
+    active
+{% endblock %}
+
+{# 网页内容 #}
+{% block content %}
+    <div class="starter-template">
+        <div class="container" id="top">
+            <h1 id="CheckedAll">霍兰德职业兴趣测试</h1>
+            <div class="container">
+                <h4>根据自己的情况，如果选择“是”，请勾选 ，否则请取消勾选</h4>
+                <div class="btn-group-vertical" role="group" aria-label="Vertical button group">
+                    {% for title_info in title_info_result %}
+                        <div class="btn-group question" role="group" style="display:none;">
+                            <label class="btn btn-default">
+                                <input type="checkbox" class="checkbox_choice" value="{{ title_info.title_num }}">{{ title_info.title_num }}.{{ title_info.title }}
+                            </label>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+            <br>
+            <div class="container">
+                <div class="progress">
+                    <div id="progress_bar" class="progress-bar progress-bar-striped" role="progressbar" style="width: 0%"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="starter-template">
+        <div class="container">
+            <button id="next_btn" class="btn btn-block btn-primary" type="button" onclick="next_page()">下一项</button>
+        </div>
+        <div class="container">
+            <button id="over_btn" class="btn btn-block btn-success" type="button" onclick="test_finished()" style="display:none;">完成</button>
+        </div>
+        <br>
+    </div>
+{% endblock %}
+
+{# 代码区域 #}
+{% block script %}
+    {# 处理按钮及进度条 #}
+    <script type="text/javascript">
+        var questions = document.getElementsByClassName("question");
+        var start_num = 0;
+        var last_num = 0;
+        var is_last_page = false;
+        var current_progress = 0;
+        var total_progress = parseFloat("{{ question_len }}");
+        // 显示前五题
+        function show_questions() {
+            var i = 0;
+            // 进度条
+            var progress_bar = document.getElementById("progress_bar");
+            for (i = last_num; i < last_num + 5; i++) {
+                if (!is_last_page && last_num + 5 == questions.length) {
+                    // 标记目前是最后一页
+                    progress_bar.classList.add("progress-bar-success");
+                    is_last_page = true;
+                }
+                if (i >= questions.length) {
+                    // 标记目前是最后一页
+                    progress_bar.classList.add("progress-bar-success");
+                    is_last_page = true;
+                    break;
+                }
+                questions[i].style.display = "inline";
+            }
+            start_num = last_num;
+            last_num = i;
+            // 设置进度条显示
+            current_progress += last_num - start_num;
+            progress_bar.style.width = current_progress / total_progress * 100 + "%";
+        }
+        show_questions();  // 第一次显示题
+
+        // 点击下一页触发的函数
+        function next_page() {
+            var i = 0;
+            for (i = start_num; i < last_num; i++) {
+                questions[i].style.display = "none";
+            }
+            show_questions();
+            // 检查是否还有下一页
+            if (is_last_page) {
+                // 隐藏下一页按钮
+                document.getElementById("next_btn").style.display = "none";
+                document.getElementById("over_btn").style.display = "inline";
+            }
+        }
+    </script>
+    {# 处理复选框的选取信息 #}
+    <script type="text/javascript">
+        var classList = document.getElementsByClassName("checkbox_choice");
+        for (var i = 0; i < classList.length; i++) {
+            // 往每一个复选框添加响应函数
+            classList[i].addEventListener("click", function() {
+                if (this.checked) {
+                    // 添加选中标记的类
+                    this.classList.add("tag_choice");
+                }
+                else {
+                    // 去除选中标记类
+                    target_checkbox.classList.remove("tag_choice");
+                }
+            });
+        }
+    </script>
+    {# 处理前端数据并提交给服务器 #}
+    <script type="text/javascript">
+        function test_finished() {
+            var tag_choice_list = document.getElementsByClassName("tag_choice");
+            var tag_choice_array = new Array();
+            for (var i = 0;  i < tag_choice_list.length; i++) {
+                tag_choice_array.push(tag_choice_list[i].value);
+            }
+            var tag_choice = JSON.stringify(tag_choice_array);
+            var parames = new Array();
+            parames.push({ name: "tag_choice", value: tag_choice});
+            parames.push({ name: "csrfmiddlewaretoken", value: "{{ csrf_token }}"});
+            Post("{% url 'new_holland_result' %}", parames);
+
+            return false;
+        }
+        /*
+        *功能： 模拟form表单的提交
+        *参数： URL 跳转地址 PARAMTERS 参数
+        */
+        function Post(URL, PARAMTERS) {
+            //创建form表单
+            var temp_form = document.createElement("form");
+            temp_form.action = URL;
+            //如需打开新窗口，form的target属性要设置为'_blank'
+            temp_form.target = "_self";
+            temp_form.method = "post";
+            temp_form.style.display = "none";
+            //添加参数
+            for (var item in PARAMTERS) {
+                var opt = document.createElement("textarea");
+                opt.name = PARAMTERS[item].name;
+                opt.value = PARAMTERS[item].value;
+                temp_form.appendChild(opt);
+            }
+            document.body.appendChild(temp_form);
+            //提交数据
+            temp_form.submit();
+        }
+    </script>
+{% endblock %}
