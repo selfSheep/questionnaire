@@ -213,6 +213,20 @@ def new_holland_result(request):
     tag_choice = [int(x) for x in tag_choice]
     # choice_info_dic = NewHollandTitleNumType.get_new_holland_title_num_type(NewHolland.get_new_holland_list(tag_choice))
     choice_info_dic = NewHollandTitleNumType.get_new_holland_title_num_type(tag_choice)
-    print(choice_info_dic)
+    # print(choice_info_dic['select_num'])
+    # 初始化记录分数的字典
+    # {('R', '现实型'): 0, ('I', '研究型'): 0, ..}
+    result_dic = dict()
+    for type_content in NewHollandType.objects.all():
+        result_dic[(type_content.item_type, type_content.item_name)] = 0
+    # print(result_dic)
+    # 把相应类型的题合计总分
+    for select_num_item in choice_info_dic['select_num']:
+        if select_num_item.score_condition:
+            result_dic[(select_num_item.new_holland_type.item_type, select_num_item.new_holland_type.item_name)] += 1
+    for not_select_num_item in choice_info_dic['not_select_num']:
+        if not not_select_num_item.score_condition:
+            result_dic[(not_select_num_item.new_holland_type.item_type, not_select_num_item.new_holland_type.item_name)] += 1
+    print(result_dic)
     context = dict()
     return render(request, 'career_test/new_holland_result.html', context)

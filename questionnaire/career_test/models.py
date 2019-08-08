@@ -140,6 +140,9 @@ class NewHolland(models.Model):
     # def get_new_holland_list(num_list):
     #     return NewHolland.objects.filter(title_num__in=num_list)
 
+    class Meta():
+        ordering = ['title_num']
+
     def __str__(self):
         return '< id:{} title_num: {} title: {} >'.format(self.id, self.title_num, self.title)
 
@@ -171,6 +174,6 @@ class NewHollandTitleNumType(models.Model):
     @staticmethod
     def get_new_holland_title_num_type(num_list):
         context = dict()
-        context['select_num'] = NewHolland.objects.filter(title_num__in=num_list)  
-        context['not_select_num'] = NewHolland.objects.exclude(title_num__in=num_list)  
+        context['select_num'] = NewHollandTitleNumType.objects.filter(new_holland__title_num__in=num_list)  
+        context['not_select_num'] = NewHollandTitleNumType.objects.exclude(new_holland__title_num__in=num_list)  
         return context
