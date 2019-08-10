@@ -1,3 +1,5 @@
+import itertools  # 排列组合的库
+
 from django.db.models import Count
 from django.http import JsonResponse
 from django.shortcuts import render
@@ -204,6 +206,15 @@ def new_holland_test(request):
     context = dict()
     context['title_info_result'] = NewHolland.get_all_title()
     context['question_len'] = context['title_info_result'].count()
+    title_info_result = []
+    for title_info in context['title_info_result']:
+        title_num = title_info.title_num
+        title_info_title = title_info.title
+        len_title_info_title = len(title_info_title)
+        for i in range(0, len_title_info_title // 20):
+            title_info_title = title_info_title[:20 + i * 20 + i * 4] + '<br>' + title_info_title[20 + i * 20 + i * 4:]
+        title_info_result.append({'title_num': title_num, 'title': title_info_title})
+    context['title_info_result'] = title_info_result
     return render(request, 'career_test/new_holland_test.html', context)
 
 
@@ -227,6 +238,110 @@ def new_holland_result(request):
     for not_select_num_item in choice_info_dic['not_select_num']:
         if not not_select_num_item.score_condition:
             result_dic[(not_select_num_item.new_holland_type.item_type, not_select_num_item.new_holland_type.item_name)] += 1
-    print(result_dic)
+    # print(result_dic)
+    # 第一种是筛选方式
+    # score_dic = {new_ranking: [score, [key_1, key_2, ...]], ...}
+    # score_dic = dict()
+    # 记录各个分数的排名
+    # new_ranking = 0
+    # 初始化分数排名字典
+    # score_dic[new_ranking] = [[key], score]
+    # for key, value in result_dic.items():
+    #     if not score_dic:
+    #         score_dic[new_ranking] = [[key], value]
+    #         new_ranking += 1
+    #         continue
+    #     for i in range(0, new_ranking):
+    #         if value > score_dic[i][1]:
+    #             for ranking in range(new_ranking, i, -1):
+    #                 score_dic[ranking] = score_dic[ranking - 1]
+    #             score_dic[i] = [[key], value]
+    #             new_ranking += 1
+    #             break
+    #         elif value == score_dic[i][1]:
+    #             # print(score_dic[i][0])
+    #             score_dic[i][0].append(key)
+    #             # print(score_dic[i][0])
+    #             break
+    #         elif value < score_dic[i][1]:
+    #             # 小于最后一个最小值
+    #             if i == new_ranking - 1:
+    #                 score_dic[new_ranking] = [[key], value]
+    #                 new_ranking += 1
+    #                 break
+    # print(score_dic)
+    # 第二种是筛选方式
+    # [[value, len, [key, ...]], ...]
+    result_score_list = [[-1, 0, []], [-1, 0, []], [-1, 0, []]]
+    for key, value in result_dic.items():
+        for i, result_list in enumerate(result_score_list):
+            if value > result_list[0]:
+                # print(result_score_list)
+                result_score_list = result_score_list[: i] + [[value, 1, [key,]]] + result_score_list[i: -1]
+                break
+            elif value == result_list[0]:
+                result_list[1] += 1
+                result_list[2].append(key)
+                break
+            elif value < result_list[0]:
+                continue
+    # print(result_score_list)
+    # 筛选类型
+    end_tag = 3
+    index_tag = 1
+    for result_score in result_score_list:
+        if result_score[1] >= end_tag:
+            break
+        else:
+            end_tag -= result_score[1]
+            index_tag += 1
+    print(result_score_list[:index_tag])
+    # []
+    # result_list = []
+    # for result_score_str in result_score_list[:index_tag]:
+    #     item = []
+    #     for i in itertools.permutations(result_score_str[2], result_score_str[1]):
+    #         item.append(i)
+    #     result_list.append(item)
+    # print(result_list)
+    result_str_list = []
+    end_tag = 3
+    for result_info in result_score_list[:index_tag]:
+        result_str = ''
+        for item in result_info[2]:
+            result_str += item[0]
+        result_str_list.append(result_str)
+        if result_info[1] >= end_tag:
+            break
+        else:
+            end_tag -= result_info[1]
+    print(result_str_list)
+
+    combination_list = []
+    for str_item in result_str_list:
+        combination_list.append(combination(str_item))
+    print(combination_list)
+    result_list = []
+    if len(combination_list) == 3:
+        for str_item in combination_list[2]:
+            result_list.append(combination_list[0][0] + combination_list[1][0] + str_item)
+    elif len(combination_list) == 2:
+        for str_item_i in combination_list[0]:
+            for str_item_j in combination_list[1]:
+                result_list.append(str_item_i + str_item_j)
+    else:
+        result_list = combination_list[0]
+    print(result_list)
     context = dict()
     return render(request, 'career_test/new_holland_result.html', context)
+
+
+# 排列组合字符串
+def combination(s=''):
+    if len(s)<=1:
+        return [s]
+    sl=[]
+    for i in range(len(s)):
+        for j in combination(s[0:i]+s[i+1:]):
+            sl.append(s[i]+j)
+    return sl

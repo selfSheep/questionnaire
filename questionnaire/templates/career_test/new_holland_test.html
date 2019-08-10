@@ -22,7 +22,11 @@
                     {% for title_info in title_info_result %}
                         <div class="btn-group question" role="group" style="display:none;">
                             <label class="btn btn-default">
-                                <input type="checkbox" class="checkbox_choice" value="{{ title_info.title_num }}">{{ title_info.title_num }}.{{ title_info.title }}
+                                <input type="checkbox" class="checkbox_choice" value="{{ title_info.title_num }}">
+                                {# 使用html代码 #}
+                                {% autoescape off %}
+                                {{ title_info.title_num }}.{{ title_info.title }}
+                                {% endautoescape %}
                             </label>
                         </div>
                     {% endfor %}
