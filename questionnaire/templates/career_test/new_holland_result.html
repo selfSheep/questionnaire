@@ -28,11 +28,18 @@
         <div id="container" class="container" style="min-width: 400px; max-width: 600px; height: 400px; margin: 0 auto"></div>
         <div class="container">
             <h3>你的人格类型为：</h3>
-            <div class="well">
-                {% for top_score in top_score_list %}
-                    {{ top_score.item_name }}（{{ top_score.item_type }}）&nbsp;
-                {% endfor %}
-            </div>
+            {% for top_score in top_score_list %}
+                <div class="well">
+                    <h3>{{ top_score.item_name }}（{{ top_score.item_type }}）&nbsp;</h3>
+                    <br>
+                    <h4>你的人格倾向：</h4>
+                    {{ top_score.personality_tendency }}
+                    <br>
+                    <h4>典型职业：</h4>
+                    {{ top_score.typical_occupation }}
+                    <br>
+                </div>
+            {% endfor %}
         </div>
         <div class="container">
             <h3>你的职业兴趣代码是：</h3>
@@ -45,6 +52,10 @@
         <div class="container">
             <h3>职业兴趣说明</h3>
             <div class="well">
+                {% for result in result_list %}
+                    {{ result }}：&nbsp;
+                    <br>
+                {% endfor %}
             </div>
         </div>
         <br>
