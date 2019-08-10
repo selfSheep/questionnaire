@@ -162,6 +162,9 @@ class NewHollandType(models.Model):
     personality_tendency = models.CharField(max_length=200, verbose_name='人格倾向')
     typical_occupation = models.CharField(max_length=100, verbose_name='典型职业')
 
+    class Meta():
+        ordering = ['id']
+
     def __str__(self):
         return '< id:{} item_type: {} item_name: {} >'.format(self.id, self.item_type, self.item_name)
 

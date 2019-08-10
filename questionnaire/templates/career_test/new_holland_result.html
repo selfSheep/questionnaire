@@ -17,18 +17,77 @@
         <div class="container" id="top">
             <h4>【霍兰德职业兴趣测试】结果</h4>
         </div>
-    </div>
-    <div class="starter-template">
-        <div class="container">
-            <h3>你的属于{{ result_str }}型的人</h3>
-            <div class="well">
-                {% for result in final_results %}
-                    <br>
-                    <h4>{{ result.result_num }}.{{ result.result_content }}</h4>
+        <div class="container well">
+            <h3>得分结果</h3>
+            <div class="btn-group" role="group" aria-label="button group">
+                {% for key, value in result_dic.items %}
+                    <div class="btn">{{ key.1 }}（{{ key.0 }}）<div class="btn">{{ value }}</div></div>
                 {% endfor %}
+            </div>
+        </div>
+        <div id="container" class="container" style="min-width: 400px; max-width: 600px; height: 400px; margin: 0 auto"></div>
+        <div class="container">
+            <h3>你的人格类型为：</h3>
+            <div class="well">
+                {% for top_score in top_score_list %}
+                    {{ top_score.item_name }}（{{ top_score.item_type }}）&nbsp;
+                {% endfor %}
+            </div>
+        </div>
+        <div class="container">
+            <h3>你的职业兴趣代码是：</h3>
+            <div class="well">
+                {% for result in result_list %}
+                    {{ result }}&nbsp;
+                {% endfor %}
+            </div>
+        </div>
+        <div class="container">
+            <h3>职业兴趣说明</h3>
+            <div class="well">
             </div>
         </div>
         <br>
         <a id="over_btn" class="btn btn-block btn-success" type="button" href="{% url 'home' %}">返回主页</a>
     </div>
+{% endblock %}
+{% block script %}
+<script type="text/javascript" src="{% static 'js/highcharts.js' %}"></script>
+<script type="text/javascript" src="{% static 'js/highcharts-more.js' %}"></script>
+<script type="text/javascript">
+    var chart = Highcharts.chart('container', {
+        chart: {
+            polar: true,
+            type: 'line'
+        },
+        title: {
+            text: '霍兰德职业倾向曲线',
+            x: -80
+        },
+        pane: {
+            size: '80%'
+        },
+        xAxis: {
+            categories: ['现实型（R）', '研究型（I）', '艺术型（A）',
+                         '社会型（S）', '企业型（E）', '传统型（C）'],
+            tickmarkPlacement: 'on',
+            lineWidth: 0
+        },
+        yAxis: {
+            gridLineInterpolation: 'polygon',
+            lineWidth: 0,
+            min: 0
+        },
+        tooltip: {
+            shared: true,
+            pointFormat: '<span style="color:{series.color}">{series.name}: <b>{point.y:,.0f}</b><br/>'
+        },
+        credits: { enabled: false },  // 去掉版权信息
+        series: [{
+            name: '得分',
+            data: [8, 5, 5, 2, 8, 4],
+            pointPlacement: 'on'
+        },]
+    });
+</script>
 {% endblock %}

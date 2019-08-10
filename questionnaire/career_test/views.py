@@ -219,6 +219,7 @@ def new_holland_test(request):
 
 
 def new_holland_result(request):
+    context = dict()
     # 获取选中的题号
     tag_choice = eval(request.POST.get('tag_choice', ''))
     tag_choice = [int(x) for x in tag_choice]
@@ -238,7 +239,8 @@ def new_holland_result(request):
     for not_select_num_item in choice_info_dic['not_select_num']:
         if not not_select_num_item.score_condition:
             result_dic[(not_select_num_item.new_holland_type.item_type, not_select_num_item.new_holland_type.item_name)] += 1
-    # print(result_dic)
+    print(result_dic)
+    context['result_dic'] = result_dic
     # 第一种是筛选方式
     # score_dic = {new_ranking: [score, [key_1, key_2, ...]], ...}
     # score_dic = dict()
@@ -285,7 +287,12 @@ def new_holland_result(request):
                 break
             elif value < result_list[0]:
                 continue
-    # print(result_score_list)
+    print(result_score_list)
+    # 筛选出最高分的信息
+    result_score_content = []
+    for result_score in result_score_list[0][2]:
+        result_score_content.append(result_score[0])
+    context['top_score_list'] = NewHollandType.objects.filter(item_type__in=result_score_content)
     # 筛选类型
     end_tag = 3
     index_tag = 1
@@ -295,53 +302,36 @@ def new_holland_result(request):
         else:
             end_tag -= result_score[1]
             index_tag += 1
-    print(result_score_list[:index_tag])
-    # []
-    # result_list = []
-    # for result_score_str in result_score_list[:index_tag]:
-    #     item = []
-    #     for i in itertools.permutations(result_score_str[2], result_score_str[1]):
-    #         item.append(i)
-    #     result_list.append(item)
-    # print(result_list)
+    # print(result_score_list[:index_tag])
+
     result_str_list = []
     end_tag = 3
     for result_info in result_score_list[:index_tag]:
-        result_str = ''
+        result_str = []
         for item in result_info[2]:
-            result_str += item[0]
+            result_str.append(item[0])
         result_str_list.append(result_str)
         if result_info[1] >= end_tag:
             break
         else:
             end_tag -= result_info[1]
-    print(result_str_list)
-
-    combination_list = []
-    for str_item in result_str_list:
-        combination_list.append(combination(str_item))
-    print(combination_list)
+    # print(result_str_list)
     result_list = []
-    if len(combination_list) == 3:
-        for str_item in combination_list[2]:
-            result_list.append(combination_list[0][0] + combination_list[1][0] + str_item)
-    elif len(combination_list) == 2:
-        for str_item_i in combination_list[0]:
-            for str_item_j in combination_list[1]:
-                result_list.append(str_item_i + str_item_j)
+    if len(result_str_list) == 3:
+        for str_item in result_str_list[2]:
+            result_list.append(result_str_list[0][0] + result_str_list[1][0] + str_item)
+    elif len(result_str_list) == 2:
+        if len(result_str_list[0]) == 2:
+            for str_item in result_str_list[1]:
+                result_list.append(result_str_list[0][0] + result_str_list[0][1] + str_item)
+                result_list.append(result_str_list[0][1] + result_str_list[0][0] + str_item)
+        else:
+            for str_item in itertools.permutations(result_str_list[1], 2):
+                result_list.append(result_str_list[0][0] + str_item[0] + str_item[1])
     else:
-        result_list = combination_list[0]
+        for str_item in itertools.permutations(result_str_list[0], 3):
+            result_list.append(str_item[0] + str_item[1] + str_item[2])
     print(result_list)
-    context = dict()
+    context['result_list'] = result_list
     return render(request, 'career_test/new_holland_result.html', context)
 
-
-# 排列组合字符串
-def combination(s=''):
-    if len(s)<=1:
-        return [s]
-    sl=[]
-    for i in range(len(s)):
-        for j in combination(s[0:i]+s[i+1:]):
-            sl.append(s[i]+j)
-    return sl
