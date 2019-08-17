@@ -22,11 +22,11 @@
                     {% for title_info in title_info_result %}
                         <div class="btn-group question" role="group" style="display:none;">
                             <label class="btn btn-default">
-                                <input type="checkbox" class="checkbox_choice" value="{{ title_info.title_num }}">
                                 {# 使用html代码 #}
                                 {% autoescape off %}
-                                {{ title_info.title_num }}.{{ title_info.title }}
+                                    <p align="left"><input type="checkbox" class="checkbox_choice" value="{{ title_info.title_num }}">{{ title_info.title_num }}.{{ title_info.title }}</p>
                                 {% endautoescape %}
+                                
                             </label>
                         </div>
                     {% endfor %}
@@ -103,26 +103,22 @@
             }
         }
     </script>
-    {# 处理复选框的选取信息 #}
-    <script type="text/javascript">
-        var classList = document.getElementsByClassName("checkbox_choice");
-        for (var i = 0; i < classList.length; i++) {
-            // 往每一个复选框添加响应函数
-            classList[i].addEventListener("click", function() {
-                if (this.checked) {
-                    // 添加选中标记的类
-                    this.classList.add("tag_choice");
-                }
-                else {
-                    // 去除选中标记类
-                    this.classList.remove("tag_choice");
-                }
-            });
-        }
-    </script>
     {# 处理前端数据并提交给服务器 #}
     <script type="text/javascript">
         function test_finished() {
+            var classList = document.getElementsByClassName("checkbox_choice");
+            for (var i = 0; i < classList.length; i++) {
+                if (classList[i].checked) {
+                    // 添加选中标记的类
+                    classList[i].classList.add("tag_choice");
+                }
+                else {
+                    // 去除选中标记类
+                    classList[i].classList.remove("tag_choice");
+                }
+            }
+
+
             var tag_choice_list = document.getElementsByClassName("tag_choice");
             var tag_choice_array = new Array();
             for (var i = 0;  i < tag_choice_list.length; i++) {

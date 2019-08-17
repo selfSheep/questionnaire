@@ -8,7 +8,8 @@ from .models import (
     QuestionBank, Choice, MBTIAnwserType,
     MBTIResult, MBTIResultDetail, CareerResultType,
     HollandData, HollandDataItem, HollandTypeResult,
-    NewHolland, NewHollandType, NewHollandTitleNumType
+    NewHolland, NewHollandType, NewHollandTitleNumType,
+    NewHollandResult
 )
 
 
@@ -84,8 +85,8 @@ def handle_anwser(request):
                     question_name = question.question_name
                     len_question_name = len(question_name)
                     # [0:10][10:20][20:30][30:40]
-                    for i in range(0, len_question_name // 20):
-                        question_name = question_name[:20 + i * 20 + i * 4] + '<br>' + question_name[20 + i * 20 + i * 4:]
+                    for i in range(0, len_question_name // 12):
+                        question_name = question_name[:12 + i * 12 + i * 5] + ' <br>' + question_name[12 + i * 12 + i * 5:]
                     question_num_and_name.append((question.question_num, question_name))
                 context['anwser_choice'] = anwser_choice
                 context['test_type'] = bank_name
@@ -211,8 +212,8 @@ def new_holland_test(request):
         title_num = title_info.title_num
         title_info_title = title_info.title
         len_title_info_title = len(title_info_title)
-        for i in range(0, len_title_info_title // 20):
-            title_info_title = title_info_title[:20 + i * 20 + i * 4] + '<br>' + title_info_title[20 + i * 20 + i * 4:]
+        for i in range(0, len_title_info_title // 12):
+            title_info_title = title_info_title[:12 + i * 12 + i * 4] + '<br>' + title_info_title[12 + i * 12 + i * 4:]
         title_info_result.append({'title_num': title_num, 'title': title_info_title})
     context['title_info_result'] = title_info_result
     return render(request, 'career_test/new_holland_test.html', context)
@@ -239,8 +240,13 @@ def new_holland_result(request):
     for not_select_num_item in choice_info_dic['not_select_num']:
         if not not_select_num_item.score_condition:
             result_dic[(not_select_num_item.new_holland_type.item_type, not_select_num_item.new_holland_type.item_name)] += 1
-    print(result_dic)
-    context['result_dic'] = result_dic
+    # print(result_dic)
+    # [[name(type), ...], [score, ...]]
+    context['result_data'] = [[], []]
+    for key, value in result_dic.items():
+        context['result_data'][0].append('{}（{}）'.format(key[1], key[0]))
+        context['result_data'][1].append(value)
+    context['result_dic'] = zip(context['result_data'][0], context['result_data'][1])
     # 第一种是筛选方式
     # score_dic = {new_ranking: [score, [key_1, key_2, ...]], ...}
     # score_dic = dict()
@@ -287,7 +293,7 @@ def new_holland_result(request):
                 break
             elif value < result_list[0]:
                 continue
-    print(result_score_list)
+    # print(result_score_list)
     # 筛选出最高分的信息
     result_score_content = []
     for result_score in result_score_list[0][2]:
@@ -331,7 +337,13 @@ def new_holland_result(request):
     else:
         for str_item in itertools.permutations(result_str_list[0], 3):
             result_list.append(str_item[0] + str_item[1] + str_item[2])
-    print(result_list)
+    # print(result_list)
     context['result_list'] = result_list
+    context['result_list_content'] = NewHollandResult.objects.filter(result_type__in=result_list)
+    # 没有相关记录
+    if context['result_list_content'].count() == 0:
+        context['result_error'] = '该代码无详细说明，请参照以下得分较高的人格类型所提供的典型职业'
+        context['result_list_content'] = NewHollandResult.objects.filter(result_type__startswith=result_score_content[0])
+    # context['test_SQL'] = NewHollandResult.objects.filter(result_type__icontains='A')
     return render(request, 'career_test/new_holland_result.html', context)
 

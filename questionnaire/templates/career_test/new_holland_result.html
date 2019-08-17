@@ -7,7 +7,7 @@
 {% endblock %}
 
 {# 标题栏高亮 #}
-{% block nav_MBTI_active %}
+{% block nav_holland_test_active %}
     active
 {% endblock %}
 
@@ -15,24 +15,26 @@
 {% block content %}
     <div class="starter-template">
         <div class="container" id="top">
-            <h4>【霍兰德职业兴趣测试】结果</h4>
+            <h4>恭喜您完成了此次霍兰德职业兴趣测试，您的测试结果为：</h4>
         </div>
         <div class="container well">
             <h3>得分结果</h3>
-            <div class="btn-group" role="group" aria-label="button group">
-                {% for key, value in result_dic.items %}
-                    <div class="btn">{{ key.1 }}（{{ key.0 }}）<div class="btn">{{ value }}</div></div>
+            <div class="btn-group-vertical" role="group" aria-label="button group">
+                {% for key, value in result_dic %}
+                <div class="btn-group" role="group">
+                    <div class="btn">{{ key }}<div class="btn">{{ value }}</div></div>
+                </div>
                 {% endfor %}
             </div>
         </div>
-        <div id="container" class="container" style="min-width: 400px; max-width: 600px; height: 400px; margin: 0 auto"></div>
+        <div id="container" class="container"></div>
         <div class="container">
-            <h3>你的人格类型为：</h3>
+            <h3>您的人格类型为：</h3>
             {% for top_score in top_score_list %}
                 <div class="well">
                     <h3>{{ top_score.item_name }}（{{ top_score.item_type }}）&nbsp;</h3>
                     <br>
-                    <h4>你的人格倾向：</h4>
+                    <h4>您的人格倾向：</h4>
                     {{ top_score.personality_tendency }}
                     <br>
                     <h4>典型职业：</h4>
@@ -42,21 +44,27 @@
             {% endfor %}
         </div>
         <div class="container">
-            <h3>你的职业兴趣代码是：</h3>
+            <h3>您的职业兴趣代码是：</h3>
             <div class="well">
                 {% for result in result_list %}
                     {{ result }}&nbsp;
                 {% endfor %}
+                {% if result_error %}
+                    <br>
+                    {{ result_error }}
+                {% endif %}
             </div>
         </div>
         <div class="container">
             <h3>职业兴趣说明</h3>
-            <div class="well">
-                {% for result in result_list %}
-                    {{ result }}：&nbsp;
+            {% for result in result_list_content %}
+                <div class="well">
+                    {{ result.result_type }}:
                     <br>
-                {% endfor %}
-            </div>
+                    {{ result.result_content }}
+                    <br>
+                </div>
+            {% endfor %}
         </div>
         <br>
         <a id="over_btn" class="btn btn-block btn-success" type="button" href="{% url 'home' %}">返回主页</a>
@@ -73,14 +81,15 @@
         },
         title: {
             text: '霍兰德职业倾向曲线',
-            x: -80
+            x: 0
         },
         pane: {
-            size: '80%'
+            size: '60%'
         },
         xAxis: {
-            categories: ['现实型（R）', '研究型（I）', '艺术型（A）',
-                         '社会型（S）', '企业型（E）', '传统型（C）'],
+            // categories: ['现实型（R）', '研究型（I）', '艺术型（A）',
+                         // '社会型（S）', '企业型（E）', '传统型（C）'],
+            categories: {{ result_data.0|safe }},
             tickmarkPlacement: 'on',
             lineWidth: 0
         },
@@ -96,9 +105,15 @@
         credits: { enabled: false },  // 去掉版权信息
         series: [{
             name: '得分',
-            data: [8, 5, 5, 2, 8, 4],
+            // data: [8, 5, 5, 2, 8, 4],
+            data: {{ result_data.1|safe }},
             pointPlacement: 'on'
-        },]
+        },
+            {
+            name: '标准值',
+            data: [4, 4, 4, 4, 4, 4],
+            pointPlacement: 'on'
+        },],
     });
 </script>
 {% endblock %}

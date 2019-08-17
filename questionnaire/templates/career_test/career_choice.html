@@ -15,18 +15,19 @@
 {% block content %}
     <div class="starter-template">
         <div class="container" id="top">
-            <h1 id="CheckedAll">
-                职业锚测试
-            </h1>
-            <br>
-            <h2>请选择你比较感兴趣的{{ top_3 }}个</h2>
+            <div class="container text-left">
+                <h1 id="CheckedAll">
+                    职业锚测试
+                </h1>
+                <h3>请选择您比较感兴趣的{{ top_3 }}个</h3>
+            </div>
             <div class="btn-group-vertical" role="group" aria-label="Vertical button group">
                 <div class="btn-group" role="group">
                 {% for item in question_num_and_name %}
                     <label class="btn btn-default">
                         {# 使用html代码 #}
                         {% autoescape off %}
-                        <input type="checkbox" class="checkbox_choice" name="{{ item.0 }}" value="{{ item.0 }}">{{ item.0 }}.{{ item.1 }}              
+                        <input style="float: left;" type="checkbox" class="checkbox_choice pull-left" name="{{ item.0 }}" value="{{ item.0 }}"><p align="left">{{ item.0 }}.{{ item.1 }}</p>           
                         {% endautoescape %}
                     </label>
                 {% endfor %}

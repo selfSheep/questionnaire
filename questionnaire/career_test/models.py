@@ -180,3 +180,12 @@ class NewHollandTitleNumType(models.Model):
         context['select_num'] = NewHollandTitleNumType.objects.filter(new_holland__title_num__in=num_list)  
         context['not_select_num'] = NewHollandTitleNumType.objects.exclude(new_holland__title_num__in=num_list)  
         return context
+
+
+class NewHollandResult(models.Model):
+    result_type = models.CharField(max_length=3, verbose_name='类型名称')
+    # result_type = models.TextField(verbose_name='类型名称')
+    result_content = models.CharField(max_length=300, verbose_name='内容')
+
+    class Meta():
+        ordering = ['id']

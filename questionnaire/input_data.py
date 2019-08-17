@@ -4,7 +4,8 @@ from career_test.models import (
     QuestionBank, Choice, MBTIAnwserType,
     MBTIResult, MBTIResultDetail, CareerResultType,
     HollandData, HollandDataItem, HollandTypeResult,
-    NewHolland, NewHollandType, NewHollandTitleNumType
+    NewHolland, NewHollandType, NewHollandTitleNumType,
+    NewHollandResult
 )
 
 
@@ -173,9 +174,20 @@ def input_condition():
             new_item.save()
         for false_num in value[1]:
             new_item = NewHollandTitleNumType()
-            new_item.new_holland = NewHolland.objects.get(title_num=true_num)
+            new_item.new_holland = NewHolland.objects.get(title_num=false_num)
             new_item.new_holland_type = NewHollandType.objects.get(item_name=key)
             new_item.score_condition = False
             new_item.save()
         print('成功录入一类')
+    print('录入成功')
+
+
+def input_new_holland_result():
+    with open('预处理数据/霍兰德职业代码.txt', 'r', encoding='UTF-8') as f:
+        for line in f.readlines():
+            type_and_coontent = line.replace('\n', '').split('：')
+            holland_data_item = NewHollandResult()
+            holland_data_item.result_type = type_and_coontent[0]
+            holland_data_item.result_content = type_and_coontent[1]
+            holland_data_item.save()
     print('录入成功')

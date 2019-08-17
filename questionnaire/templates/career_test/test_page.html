@@ -23,16 +23,19 @@
             </h1>
             {% for item in question_and_choice %}
                 <div id="choice_{{ item.0.0 }}" class="container question" style="display:none;" data-finished="0">
-                    <h4>{{ item.0.0 }}.{{ item.0.1 }}</h4>
                     {% if test_type == 'career_anchor' %}
-                        <div class="btn-group" role="group" aria-label="button group">
+                        <h4 class="text-left">{{ item.0.0 }}.{{ item.0.1 }}</h4>
+                        <!-- <div class="btn-group" role="group" aria-label="button group"> -->
                     {% else %}
-                        <div class="btn-group-vertical" role="group" aria-label="Vertical button group">
+                        <h4 class="text-left">{{ item.0.0 }}.{{ item.0.1 }}</h4>
+                        <!-- <div class="btn-group-vertical" role="group" aria-label="Vertical button group"> -->
                     {% endif %}
+                    <br>
+                    <div class="btn-group-vertical" role="group" aria-label="Vertical button group">
                     {% for choice in item.1 %}
                         <div class="btn-group" role="group">
                             <button type="button" class="btn btn-default select choice_{{ item.0.0 }}" data-question_num="{{ item.0.0 }}" data-anwser_choice="{{ choice.0 }}" data-num="choice_{{ item.0.0 }}">
-                                {{ choice.0 }}.{{ choice.1 }}
+                                <span style="float: left;">{{ choice.0 }}.{{ choice.1 }}</span>
                             </button>
                         </div>
                     {% endfor %}
@@ -58,6 +61,11 @@
 {# 代码区域 #}
 {% block script %}
     <script type="text/javascript">
+        {% if test_type == 'MBTI' %}
+            document.getElementById("MBTI_menu").classList.add("active");
+        {% else %}
+            document.getElementById("career_anchor_menu").classList.add("active");
+        {% endif %}
         var choice_button = document.getElementsByClassName("select");
         var finished_tag = 0;
         var questions = document.getElementsByClassName("question");
