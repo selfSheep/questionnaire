@@ -19,7 +19,7 @@
         </div>
         <div class="container">
             {% for result_item in result_content %}
-                <h3>你属于{{ result_item.result_type }}型（{{ result_item.result_title }}）的人</h3>
+                <h3>您属于{{ result_item.result_type }}型（{{ result_item.result_title }}）的人</h3>
                 <h4>适合的职业为：</h4>
                 <div class="well">
                     {{ result_item.result_detail }}
@@ -29,14 +29,14 @@
     </div>
     <div class="starter-template">
         <div class="container">
-            <h3>与测试结果对比一下你喜欢的职业或专业:</h3>
+            <h3>与测试结果对比一下您喜欢的职业或专业:</h3>
             <div class="well">
                 {% for item in user_input_1 %}
                     <p>{{ item }}</p>
                 {% endfor %}
             </div>
             <br>
-            <h3>你期待的因素:</h3>
+            <h3>您期待的因素:</h3>
             <div class="well">
                 {% for item in user_input_6 %}
                     <p>{{ item }}</p>

@@ -25,39 +25,39 @@
             <img id="index-pic-1" src="{% static 'about/img/主页介绍.png' %}" style="display:none;" class="img-rounded img-responsive" alt="Cinque Terre">
             <img id="index-pic-2" src="{% static 'about/img/主页介绍2.png' %}" style="display:none;" class="img-rounded img-responsive" alt="Cinque Terre">
             <img id="index-pic-3" src="{% static 'about/img/主页介绍3.png' %}" style="display:none;" class="img-rounded img-responsive" alt="Cinque Terre">
-            <div class="pull-right">
-                公众号二维码
-                <img src="{% static 'about/img/公众号二维码.jpg' %}" class="img-rounded img-responsive" width="200" height="200" alt="Cinque Terre">
-            </div>
+        </div>
+        <div class="container center-block">
+            公众号二维码
+            <img class="center-block" src="{% static 'about/img/公众号二维码.jpg' %}" class="img-rounded img-responsive" width="200" height="200" alt="Cinque Terre">
+        </div>
+        <div class="container">
+            <h3>霍兰德职业兴趣测试</h3>
+            <a href="{% url 'new_holland_test' %}">
+                <img src="{% static 'about/img/霍兰德职业兴趣测试.png' %}"  style="display:none;" class="img-rounded img-responsive center_pic" alt="Cinque Terre">
+            </a>
+        </div>
+        <div class="container">
+            <h3>MBTI职业性格测试</h3>
+            <a href="{% url 'test_page' 'MBTI' %}">
+                <img src="{% static 'about/img/MBTI职业性格测试.png' %}"  style="display:none;" class="img-rounded img-responsive center_pic" alt="Cinque Terre">
+            </a>
+        </div>
+        <div class="container">
+            <h3>职业锚测评</h3>
+            <a href="{% url 'test_page' 'career_anchor' %}">
+                <img src="{% static 'about/img/职业锚测评.png' %}"  style="display:none;" class="img-rounded img-responsive center_pic" alt="Cinque Terre">
+            </a>
         </div>
       </div>
-    </div><!-- /.container  -->
-    <div class="container">
-        <h1 class="pull-right">霍兰德职业兴趣测试</h1>
-        {# <a href="{% url 'holland_test' %}"> #}
-        <a href="{% url 'new_holland_test' %}">
-            <img src="{% static 'about/img/霍兰德职业兴趣测试.png' %}" class="img-rounded pull-right img-responsive" alt="Cinque Terre" style="width: 600px;height: 200px;">
-        </a>
     </div>
-    <div class="container">
-        <h1>MBTI职业性格测试</h1>
-        <a href="{% url 'test_page' 'MBTI' %}">
-            <img src="{% static 'about/img/MBTI职业性格测试.png' %}" class="img-rounded img-responsive" alt="Cinque Terre">
-        </a>
-    </div>
-    <br>
-    <div class="container">
-        <h1 class="pull-right">职业锚测评</h1>
-        <a href="{% url 'test_page' 'career_anchor' %}">
-            <img src="{% static 'about/img/职业锚测评.png' %}" class="img-rounded pull-right img-responsive" alt="Cinque Terre" style="width: 600px;height: 200px;">
-        </a>
-    </div>
-    <br>
 {% endblock %}
-
 {# 代码块 #}
 {% block script %}
     <script type="text/javascript">
+        var classList = document.getElementsByClassName("center_pic");
+        for (var i = 0; i < classList.length; i++) {
+            classList[i].style.display = "inline";
+        }
         // 轮播图控制代码
         document.getElementById("index-pic-1").style.display = "inline";
         var loop_num = 0;

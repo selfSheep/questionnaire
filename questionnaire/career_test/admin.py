@@ -3,7 +3,8 @@ from .models import (
     QuestionBank, Choice, MBTIAnwserType,
     MBTIResult, MBTIResultDetail, CareerResultType,
     HollandData, HollandDataItem, HollandTypeResult,
-    NewHolland, NewHollandType, NewHollandTitleNumType
+    NewHolland, NewHollandType, NewHollandTitleNumType,
+    NewHollandResult
 )
 
 @admin.register(QuestionBank)
@@ -64,3 +65,8 @@ class NewHollandTypeAdmin(admin.ModelAdmin):
 @admin.register(NewHollandTitleNumType)
 class NewHollandTitleNumTypeAdmin(admin.ModelAdmin):
     list_display = ('id', 'new_holland', 'new_holland_type', 'score_condition')
+
+
+@admin.register(NewHollandResult)
+class NewHollandResultAdmin(admin.ModelAdmin):
+    list_display = ('id', 'result_type', 'result_content')

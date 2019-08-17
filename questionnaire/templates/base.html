@@ -34,9 +34,9 @@
           <ul class="nav navbar-nav">
             <li class="{% block nav_home_active %}{% endblock %}"><a href="{% url 'home' %}">主页</a></li>
             <li class="{% block nav_about_active %}{% endblock %}"><a href="{% url 'about' %}">关于我们</a></li>
-            <li class="{% block nav_holland_test_active %}{% endblock %}"><a href="{% url 'holland_test' %}">霍兰德测试</a></li>
-            <li class="{% block nav_MBTI_active %}{% endblock %}"><a href="{% url 'test_page' 'MBTI' %}">MBTI测试</a></li>
-            <li class="{% block nav_career_anchor_active %}{% endblock %}"><a href="{% url 'test_page' 'career_anchor' %}">职业锚测试</a></li>
+            <li class="{% block nav_holland_test_active %}{% endblock %}"><a href="{% url 'new_holland_test' %}">霍兰德测试</a></li>
+            <li id="MBTI_menu" class="{% block nav_MBTI_active %}{% endblock %}"><a href="{% url 'test_page' 'MBTI' %}">MBTI测试</a></li>
+            <li id="career_anchor_menu" class="{% block nav_career_anchor_active %}{% endblock %}"><a href="{% url 'test_page' 'career_anchor' %}">职业锚测试</a></li>
           </ul>
         </div><!--/.nav-collapse -->
       </div>

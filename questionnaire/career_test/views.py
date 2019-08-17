@@ -1,3 +1,5 @@
+import itertools  # 排列组合的库
+
 from django.db.models import Count
 from django.http import JsonResponse
 from django.shortcuts import render
@@ -6,7 +8,8 @@ from .models import (
     QuestionBank, Choice, MBTIAnwserType,
     MBTIResult, MBTIResultDetail, CareerResultType,
     HollandData, HollandDataItem, HollandTypeResult,
-    NewHolland, NewHollandType, NewHollandTitleNumType
+    NewHolland, NewHollandType, NewHollandTitleNumType,
+    NewHollandResult
 )
 
 
@@ -82,8 +85,8 @@ def handle_anwser(request):
                     question_name = question.question_name
                     len_question_name = len(question_name)
                     # [0:10][10:20][20:30][30:40]
-                    for i in range(0, len_question_name // 20):
-                        question_name = question_name[:20 + i * 20 + i * 4] + '<br>' + question_name[20 + i * 20 + i * 4:]
+                    for i in range(0, len_question_name // 12):
+                        question_name = question_name[:12 + i * 12 + i * 5] + ' <br>' + question_name[12 + i * 12 + i * 5:]
                     question_num_and_name.append((question.question_num, question_name))
                 context['anwser_choice'] = anwser_choice
                 context['test_type'] = bank_name
@@ -204,15 +207,143 @@ def new_holland_test(request):
     context = dict()
     context['title_info_result'] = NewHolland.get_all_title()
     context['question_len'] = context['title_info_result'].count()
+    title_info_result = []
+    for title_info in context['title_info_result']:
+        title_num = title_info.title_num
+        title_info_title = title_info.title
+        len_title_info_title = len(title_info_title)
+        for i in range(0, len_title_info_title // 12):
+            title_info_title = title_info_title[:12 + i * 12 + i * 4] + '<br>' + title_info_title[12 + i * 12 + i * 4:]
+        title_info_result.append({'title_num': title_num, 'title': title_info_title})
+    context['title_info_result'] = title_info_result
     return render(request, 'career_test/new_holland_test.html', context)
 
 
 def new_holland_result(request):
+    context = dict()
     # 获取选中的题号
     tag_choice = eval(request.POST.get('tag_choice', ''))
     tag_choice = [int(x) for x in tag_choice]
     # choice_info_dic = NewHollandTitleNumType.get_new_holland_title_num_type(NewHolland.get_new_holland_list(tag_choice))
     choice_info_dic = NewHollandTitleNumType.get_new_holland_title_num_type(tag_choice)
-    print(choice_info_dic)
-    context = dict()
+    # print(choice_info_dic['select_num'])
+    # 初始化记录分数的字典
+    # {('R', '现实型'): 0, ('I', '研究型'): 0, ..}
+    result_dic = dict()
+    for type_content in NewHollandType.objects.all():
+        result_dic[(type_content.item_type, type_content.item_name)] = 0
+    # print(result_dic)
+    # 把相应类型的题合计总分
+    for select_num_item in choice_info_dic['select_num']:
+        if select_num_item.score_condition:
+            result_dic[(select_num_item.new_holland_type.item_type, select_num_item.new_holland_type.item_name)] += 1
+    for not_select_num_item in choice_info_dic['not_select_num']:
+        if not not_select_num_item.score_condition:
+            result_dic[(not_select_num_item.new_holland_type.item_type, not_select_num_item.new_holland_type.item_name)] += 1
+    # print(result_dic)
+    # [[name(type), ...], [score, ...]]
+    context['result_data'] = [[], []]
+    for key, value in result_dic.items():
+        context['result_data'][0].append('{}（{}）'.format(key[1], key[0]))
+        context['result_data'][1].append(value)
+    context['result_dic'] = zip(context['result_data'][0], context['result_data'][1])
+    # 第一种是筛选方式
+    # score_dic = {new_ranking: [score, [key_1, key_2, ...]], ...}
+    # score_dic = dict()
+    # 记录各个分数的排名
+    # new_ranking = 0
+    # 初始化分数排名字典
+    # score_dic[new_ranking] = [[key], score]
+    # for key, value in result_dic.items():
+    #     if not score_dic:
+    #         score_dic[new_ranking] = [[key], value]
+    #         new_ranking += 1
+    #         continue
+    #     for i in range(0, new_ranking):
+    #         if value > score_dic[i][1]:
+    #             for ranking in range(new_ranking, i, -1):
+    #                 score_dic[ranking] = score_dic[ranking - 1]
+    #             score_dic[i] = [[key], value]
+    #             new_ranking += 1
+    #             break
+    #         elif value == score_dic[i][1]:
+    #             # print(score_dic[i][0])
+    #             score_dic[i][0].append(key)
+    #             # print(score_dic[i][0])
+    #             break
+    #         elif value < score_dic[i][1]:
+    #             # 小于最后一个最小值
+    #             if i == new_ranking - 1:
+    #                 score_dic[new_ranking] = [[key], value]
+    #                 new_ranking += 1
+    #                 break
+    # print(score_dic)
+    # 第二种是筛选方式
+    # [[value, len, [key, ...]], ...]
+    result_score_list = [[-1, 0, []], [-1, 0, []], [-1, 0, []]]
+    for key, value in result_dic.items():
+        for i, result_list in enumerate(result_score_list):
+            if value > result_list[0]:
+                # print(result_score_list)
+                result_score_list = result_score_list[: i] + [[value, 1, [key,]]] + result_score_list[i: -1]
+                break
+            elif value == result_list[0]:
+                result_list[1] += 1
+                result_list[2].append(key)
+                break
+            elif value < result_list[0]:
+                continue
+    # print(result_score_list)
+    # 筛选出最高分的信息
+    result_score_content = []
+    for result_score in result_score_list[0][2]:
+        result_score_content.append(result_score[0])
+    context['top_score_list'] = NewHollandType.objects.filter(item_type__in=result_score_content)
+    # 筛选类型
+    end_tag = 3
+    index_tag = 1
+    for result_score in result_score_list:
+        if result_score[1] >= end_tag:
+            break
+        else:
+            end_tag -= result_score[1]
+            index_tag += 1
+    # print(result_score_list[:index_tag])
+
+    result_str_list = []
+    end_tag = 3
+    for result_info in result_score_list[:index_tag]:
+        result_str = []
+        for item in result_info[2]:
+            result_str.append(item[0])
+        result_str_list.append(result_str)
+        if result_info[1] >= end_tag:
+            break
+        else:
+            end_tag -= result_info[1]
+    # print(result_str_list)
+    result_list = []
+    if len(result_str_list) == 3:
+        for str_item in result_str_list[2]:
+            result_list.append(result_str_list[0][0] + result_str_list[1][0] + str_item)
+    elif len(result_str_list) == 2:
+        if len(result_str_list[0]) == 2:
+            for str_item in result_str_list[1]:
+                result_list.append(result_str_list[0][0] + result_str_list[0][1] + str_item)
+                result_list.append(result_str_list[0][1] + result_str_list[0][0] + str_item)
+        else:
+            for str_item in itertools.permutations(result_str_list[1], 2):
+                result_list.append(result_str_list[0][0] + str_item[0] + str_item[1])
+    else:
+        for str_item in itertools.permutations(result_str_list[0], 3):
+            result_list.append(str_item[0] + str_item[1] + str_item[2])
+    # print(result_list)
+    context['result_list'] = result_list
+    context['result_list_content'] = NewHollandResult.objects.filter(result_type__in=result_list)
+    # 没有相关记录
+    if context['result_list_content'].count() == 0:
+        context['result_error'] = '该代码无详细说明，请参照以下得分较高的人格类型所提供的典型职业'
+        context['result_list_content'] = NewHollandResult.objects.filter(result_type__startswith=result_score_content[0])
+    # context['test_SQL'] = NewHollandResult.objects.filter(result_type__icontains='A')
     return render(request, 'career_test/new_holland_result.html', context)
+

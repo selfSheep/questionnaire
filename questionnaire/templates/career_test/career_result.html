@@ -14,15 +14,13 @@
 {# 网页内容 #}
 {% block content %}
     <div class="starter-template">
-        <div class="container" id="top">
-            <h1>职业锚测试结果</h1>
-        </div>
-    </div>
-    <div class="starter-template">
         <div class="container">
-            <h3>你的属于
+            <h1>恭喜您完成了此次职业锚测试，您的测试结果为：</h1>
+        </div>
+        <div class="container">
+            <h3>您属于
             {% for result_type in max_list.1 %}
-                {{ result_type }}，
+                {{ result_type }} 
             {% endfor %}
             型的人</h3>
             {% for result in career_result %}

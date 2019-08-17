@@ -140,6 +140,9 @@ class NewHolland(models.Model):
     # def get_new_holland_list(num_list):
     #     return NewHolland.objects.filter(title_num__in=num_list)
 
+    class Meta():
+        ordering = ['title_num']
+
     def __str__(self):
         return '< id:{} title_num: {} title: {} >'.format(self.id, self.title_num, self.title)
 
@@ -159,6 +162,9 @@ class NewHollandType(models.Model):
     personality_tendency = models.CharField(max_length=200, verbose_name='人格倾向')
     typical_occupation = models.CharField(max_length=100, verbose_name='典型职业')
 
+    class Meta():
+        ordering = ['id']
+
     def __str__(self):
         return '< id:{} item_type: {} item_name: {} >'.format(self.id, self.item_type, self.item_name)
 
@@ -171,6 +177,15 @@ class NewHollandTitleNumType(models.Model):
     @staticmethod
     def get_new_holland_title_num_type(num_list):
         context = dict()
-        context['select_num'] = NewHolland.objects.filter(title_num__in=num_list)  
-        context['not_select_num'] = NewHolland.objects.exclude(title_num__in=num_list)  
+        context['select_num'] = NewHollandTitleNumType.objects.filter(new_holland__title_num__in=num_list)  
+        context['not_select_num'] = NewHollandTitleNumType.objects.exclude(new_holland__title_num__in=num_list)  
         return context
+
+
+class NewHollandResult(models.Model):
+    result_type = models.CharField(max_length=3, verbose_name='类型名称')
+    # result_type = models.TextField(verbose_name='类型名称')
+    result_content = models.CharField(max_length=300, verbose_name='内容')
+
+    class Meta():
+        ordering = ['id']
